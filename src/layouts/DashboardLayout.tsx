@@ -2,6 +2,7 @@ import { Outlet, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import TopNavigation from '../components/TopNavigation'
 import { supabase } from '../lib/supabase'
+import SupportWidget from '../components/SupportWidget'
 
 export default function DashboardLayout() {
   const [loading, setLoading] = useState(true)
@@ -90,6 +91,7 @@ export default function DashboardLayout() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 pb-20 relative z-20">
         <Outlet />
       </main>
+      <SupportWidget />
     </div>
   )
 }

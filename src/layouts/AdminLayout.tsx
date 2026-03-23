@@ -1,6 +1,6 @@
 import { Outlet, NavLink, Link, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { LayoutDashboard, Users, CheckSquare, LogOut, ShieldAlert, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Users, CheckSquare, LogOut, ShieldAlert, Menu, X, MessageSquare } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const ADMIN_EMAILS = [
@@ -34,9 +34,10 @@ export default function AdminLayout() {
   }
   
   const navItems = [
-    { path: '/admin', label: 'Overview', icon: LayoutDashboard },
-    { path: '/admin/users', label: 'Manage Users', icon: Users },
-    { path: '/admin/approvals', label: 'Pending Approvals', icon: CheckSquare },
+    { label: 'Overview', path: '/admin', icon: LayoutDashboard },
+    { label: 'Manage Users', path: '/admin/users', icon: Users },
+    { label: 'Pending Approvals', path: '/admin/approvals', icon: CheckSquare },
+    { label: 'Support Inbox', path: '/admin/support', icon: MessageSquare },
   ]
 
   return (

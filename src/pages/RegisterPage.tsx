@@ -260,9 +260,8 @@ export default function RegisterPage() {
             
             <div className="grid grid-cols-2 gap-y-5 gap-x-6 mb-12">
               {[
-                'Stock Shares', 'Assets Management',
-                'Infrastructure Shares', 'Forex Shares',
-                'Agricultural Shares', 'Real Estate Planning'
+                'Crypto Trading', 'Stock Shares',
+                'Assets Management', 'Forex Shares'
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded flex items-center justify-center shrink-0"
@@ -281,10 +280,16 @@ export default function RegisterPage() {
                 style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
                 Login Now
               </Link>
-              <a href="#form" className="px-8 py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:-translate-y-0.5 pointer-events-none"
+              <button 
+                type="button"
+                onClick={() => {
+                  document.getElementById('register-form')?.scrollIntoView({ behavior: 'smooth' });
+                  setTimeout(() => document.getElementById('username')?.focus(), 500);
+                }}
+                className="px-8 py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:-translate-y-0.5"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 Get Started
-              </a>
+              </button>
             </div>
           </div>
 
@@ -311,26 +316,63 @@ export default function RegisterPage() {
           {/* Section 3: About Our Company */}
           <div className="auth-enter auth-enter-delay-3 pt-6">
             <div className="text-[11px] uppercase tracking-[0.2em] text-purple-400 font-bold mb-3">About Our Company</div>
-            <h3 className="text-4xl font-black text-white mb-6 leading-[1.1]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h3 className="text-4xl font-black text-white mb-8 leading-[1.1]" style={{ fontFamily: 'Outfit, sans-serif' }}>
               Reach Your Personal<br />Goals With Us
             </h3>
+
+            {/* Images grid matching the requested style */}
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              <div className="col-span-2 h-40 rounded-2xl overflow-hidden relative group">
+                <div className="absolute inset-0 bg-purple-500/20 mix-blend-overlay z-10"></div>
+                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&q=80" alt="Team Meeting" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              </div>
+              <div className="h-44 rounded-2xl overflow-hidden relative group">
+                <div className="absolute inset-0 bg-fuchsia-500/20 mix-blend-overlay z-10"></div>
+                <img src="https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&q=80" alt="Crypto" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              </div>
+              <div className="h-44 rounded-2xl overflow-hidden relative group" style={{ background: 'rgba(20,25,40,0.8)', border: '1px solid rgba(168,85,247,0.15)' }}>
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-20">
+                  <div className="w-12 h-12 rounded-full mb-2 flex items-center justify-center" style={{ background: 'rgba(16,185,129,0.15)' }}>
+                    <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="font-bold text-white text-lg font-outfit">10+ Years</div>
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Of Experiences</div>
+                </div>
+              </div>
+            </div>
+
             <div className="text-sm text-slate-400 leading-[1.8] space-y-5">
               <p>
                 Established by a strong team of highly skilled traders and consultants in the offline and online markets. We put your shares in new highly remunerative innovative projects, which offers great returns.
               </p>
               <p>
-                We pioneered a consulting-based approach to private asset investing, partnering closely with management teams to offer the insights that challenge conventional thinking, build great businesses, and improve operations. You'll find a team of financial professionals with years of industry experience ready to help you navigate your financial future.
+                We pioneered a consulting-based approach to private asset investing. You'll find a team of financial professionals with years of industry experience ready to help you navigate your financial future.
               </p>
             </div>
+            
             <div className="mt-8 flex items-center gap-4">
-              <a href="#explore" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:-translate-y-0.5 pointer-events-none"
+              <button 
+                type="button"
+                onClick={() => {
+                  document.getElementById('register-form')?.scrollIntoView({ behavior: 'smooth' });
+                  setTimeout(() => document.getElementById('username')?.focus(), 500);
+                }}
+                className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                 style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.2)' }}>
                 Explore Now
-              </a>
-              <a href="#step" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:-translate-y-0.5 pointer-events-none"
+              </button>
+              <button 
+                type="button"
+                onClick={() => {
+                  document.getElementById('register-form')?.scrollIntoView({ behavior: 'smooth' });
+                  setTimeout(() => document.getElementById('username')?.focus(), 500);
+                }}
+                className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 Take A Step
-              </a>
+              </button>
             </div>
           </div>
 
@@ -343,9 +385,9 @@ export default function RegisterPage() {
             
             <div className="space-y-4">
               {[
-                { title: 'Stocks / Options', desc: 'With over 500+ registered and regulated traders, you can start with our copy trading tool for explosive growth.', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+                { title: 'Crypto Trading', desc: 'Securely trade top cryptocurrencies with our advanced matching engine and deep liquidity pools for explosive growth.', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
                 { title: 'Mutual Funds', desc: 'Making an entry into household savings with increased awareness and higher efforts towards financial planning.', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-                { title: 'Real Estate', desc: 'We and our affiliates have owned, developed, and managed multifamily, offices, industrial, retail, and hotel properties.', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' }
+                { title: 'Crypto Assets', desc: 'Gain exposure to diversified crypto asset portfolios, rigorously vetted by our expert analysts and advisors.', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' }
               ].map((svc, i) => (
                 <div key={i} className="p-6 rounded-2xl flex gap-5 items-start group transition-all hover:bg-white/[0.04]"
                   style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -373,7 +415,7 @@ export default function RegisterPage() {
       {/* ═══════════════════════════════════════
           RIGHT PANEL — Register Form
       ═══════════════════════════════════════ */}
-      <div className="flex-1 flex items-start justify-center p-5 sm:p-8 relative z-10 overflow-y-auto min-h-screen">
+      <div id="register-form" className="flex-1 flex items-start justify-center p-5 sm:p-8 relative z-10 overflow-y-auto min-h-screen">
         <div className="w-full max-w-[580px] py-8">
 
           {/* Mobile brand */}

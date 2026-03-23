@@ -19,13 +19,15 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import UsersPage from './pages/admin/UsersPage'
 import UserDetailsPage from './pages/admin/UserDetailsPage'
 import ApprovalsPage from './pages/admin/ApprovalsPage'
+import AdminSupportPage from './pages/admin/AdminSupportPage'
+import SupportWidget from './components/SupportWidget'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Auth Routes */}
-        <Route path="/" element={<RegisterPage />} />
+        <Route path="/" element={<><RegisterPage /><SupportWidget /></>} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Dashboard Routes with Layout */}
@@ -48,6 +50,7 @@ function App() {
           <Route path="users" element={<UsersPage />} />
           <Route path="users/:id" element={<UserDetailsPage />} />
           <Route path="approvals" element={<ApprovalsPage />} />
+          <Route path="support" element={<AdminSupportPage />} />
         </Route>
 
         {/* Catch-all redirect to Home/Register */}
