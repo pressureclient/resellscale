@@ -122,7 +122,6 @@ export default function ProfilePage() {
   const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
-  const [isEditing, setIsEditing] = useState(false)
   const [show2FA, setShow2FA] = useState(false)
 
   /* Editable fields */
@@ -230,7 +229,6 @@ export default function ProfilePage() {
       if (error) throw error
 
       showToast(true, 'Profile saved successfully!')
-      setIsEditing(false)
     } catch (err: any) {
       showToast(false, err.message || 'Failed to save profile.')
     } finally {
@@ -244,7 +242,6 @@ export default function ProfilePage() {
     setFullName(profile?.full_name || meta.full_name || '')
     setUsername(profile?.username || meta.username || '')
     setPhone(meta.phone || '')
-    setIsEditing(false)
   }
 
   if (loading) return (
@@ -280,7 +277,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Header */}
       <div className="flex items-center justify-between mb-7">
         <div className="flex items-center gap-3">
           <Link to="/dashboard"
@@ -291,26 +287,6 @@ export default function ProfilePage() {
             </svg>
           </Link>
           <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>My Profile</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          {isEditing && (
-            <button onClick={handleCancel} disabled={saving}
-              className="text-sm font-semibold px-4 py-2.5 rounded-xl transition-all text-slate-400 hover:text-white"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              Cancel
-            </button>
-          )}
-          <button onClick={isEditing ? handleSave : () => setIsEditing(true)}
-            disabled={saving}
-            className="text-sm font-semibold px-5 py-2.5 rounded-xl transition-all disabled:opacity-60"
-            style={{
-              background: isEditing ? 'linear-gradient(135deg, #c026d3, #7c3aed)' : 'rgba(168,85,247,0.1)',
-              border: `1px solid ${isEditing ? 'transparent' : 'rgba(168,85,247,0.25)'}`,
-              color: isEditing ? 'white' : '#c084fc',
-              boxShadow: isEditing ? '0 4px 16px rgba(192,38,211,0.3)' : 'none'
-            }}>
-            {saving ? 'Saving…' : isEditing ? 'Save Changes' : 'Edit Profile'}
-          </button>
         </div>
       </div>
 
@@ -383,18 +359,18 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Full Name</Label>
-                <input type="text" disabled={!isEditing} value={fullName} onChange={e => setFullName(e.target.value)}
+                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)}
                   className="w-full text-sm rounded-xl px-4 py-3 outline-none transition-all"
-                  style={{ ...inputStyle, opacity: isEditing ? 1 : 0.65 }}
-                  onFocus={e => isEditing && ((e.target as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)')}
+                  style={{ ...inputStyle }}
+                  onFocus={e => ((e.target as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)')}
                   onBlur={e => ((e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)')} />
               </div>
               <div>
                 <Label>Username</Label>
-                <input type="text" disabled={!isEditing} value={username} onChange={e => setUsername(e.target.value)}
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)}
                   className="w-full text-sm rounded-xl px-4 py-3 outline-none transition-all"
-                  style={{ ...inputStyle, opacity: isEditing ? 1 : 0.65 }}
-                  onFocus={e => isEditing && ((e.target as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)')}
+                  style={{ ...inputStyle }}
+                  onFocus={e => ((e.target as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)')}
                   onBlur={e => ((e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)')} />
               </div>
             </div>
@@ -410,11 +386,11 @@ export default function ProfilePage() {
               <div>
                 <Label>Phone Number</Label>
                 {/* Phone is stored in auth metadata — shown read-only or editable */}
-                <input type="tel" disabled={!isEditing} value={phone} onChange={e => setPhone(e.target.value)}
+                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                   placeholder="e.g. +1 555 0000"
                   className="w-full text-sm rounded-xl px-4 py-3 outline-none transition-all"
-                  style={{ ...inputStyle, opacity: isEditing ? 1 : 0.65 }}
-                  onFocus={e => isEditing && ((e.target as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)')}
+                  style={{ ...inputStyle }}
+                  onFocus={e => ((e.target as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)')}
                   onBlur={e => ((e.target as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)')} />
               </div>
             </div>
@@ -455,6 +431,19 @@ export default function ProfilePage() {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="flex justify-end pt-6 mt-6 border-t border-white/[0.06] gap-3">
+            <button onClick={handleCancel} disabled={saving}
+              className="text-sm font-semibold px-5 py-2.5 rounded-xl transition-all text-slate-400 hover:text-white"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              Revert
+            </button>
+            <button onClick={handleSave} disabled={saving}
+              className="font-bold py-2.5 px-8 rounded-xl text-sm text-white transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
+              style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
           </div>
         </Panel>
       </div>

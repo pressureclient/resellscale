@@ -159,7 +159,19 @@ export default function SettingsPage() {
   const [invUpdates, setInvUpdates] = useState(true)
   const [secAlerts, setSecAlerts] = useState(true)
   const [marketing, setMarketing] = useState(false)
+  const [showSaveToast, setShowSaveToast] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [language, setLanguage] = useState('English')
+
+  const handleGlobalSave = () => {
+    setIsSaving(true)
+    // Simulate save delay
+    setTimeout(() => {
+      setIsSaving(false)
+      setShowSaveToast(true)
+      setTimeout(() => setShowSaveToast(false), 3000)
+    }, 600)
+  }
 
   const tabs = [
     { key: 'notifications', label: 'Notifications', icon: Bell },
@@ -175,8 +187,27 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       {show2FA && <TwoFAModal onClose={() => setShow2FA(false)} />}
+
+      {/* Global Save Toast */}
+      {showSaveToast && (
+        <div className="fixed bottom-6 right-6 z-[99999] flex items-start gap-3 rounded-2xl shadow-2xl p-4 w-80 animate-in slide-in-from-bottom flex-col"
+          style={{ background: 'rgba(10,13,20,0.98)', border: '1px solid rgba(16,185,129,0.2)', boxShadow: '0 24px 48px rgba(0,0,0,0.6)' }}>
+          <div className="flex items-center gap-3 w-full">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-white">Settings Saved</p>
+              <p className="text-xs text-slate-400 mt-0.5">Your preferences have been updated.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-3 mb-7">
         <Link to="/dashboard"
@@ -289,9 +320,11 @@ export default function SettingsPage() {
 
           <div className="flex justify-end pt-1">
             <button
-              className="font-bold py-3 px-8 rounded-xl text-sm text-white transition-all hover:-translate-y-0.5"
+              onClick={handleGlobalSave}
+              disabled={isSaving}
+              className="font-bold py-3 px-8 rounded-xl text-sm text-white transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
               style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>

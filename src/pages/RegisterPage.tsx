@@ -224,17 +224,18 @@ export default function RegisterPage() {
         style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)', filter: 'blur(60px)' }} />
 
       {/* ═══════════════════════════════════════
-          LEFT PANEL — Brand & Value Props
+          LEFT PANEL — Brand & Value Props (Scrollable Landing Page Style)
       ═══════════════════════════════════════ */}
-      <div className="hidden lg:flex flex-col w-[420px] shrink-0 relative z-10 border-r border-white/[0.05] panel-enter"
+      <div className="hidden lg:flex flex-col w-1/2 shrink-0 relative z-10 border-r border-white/[0.05] panel-enter overflow-y-auto custom-scrollbar"
         style={{ background: 'linear-gradient(160deg, rgba(15,20,35,0.95) 0%, rgba(10,13,22,0.98) 100%)' }}>
 
         <div className="absolute top-0 left-0 right-0 h-px"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(168,85,247,0.5), rgba(217,70,239,0.3), transparent)' }} />
 
-        <div className="flex flex-col h-full p-10">
-          {/* Brand */}
-          <div className="flex items-center gap-3.5 auth-enter">
+        <div className="flex flex-col py-10 px-12 xl:px-16 space-y-20 pb-24">
+          
+          {/* Brand header */}
+          <div className="flex items-center gap-3.5 auth-enter shrink-0">
             <div className="w-11 h-11 rounded-xl overflow-hidden ring-1 ring-purple-500/20 shadow-lg shadow-purple-900/30 glow-pulse shrink-0">
               <img src="/logo.jpg" alt="Resellscale" className="w-full h-full object-cover" />
             </div>
@@ -246,62 +247,125 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center mt-12">
-            <div className="auth-enter auth-enter-delay-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-7 text-[11px] font-semibold tracking-widest uppercase"
-                style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', color: 'rgba(196,181,253,0.8)' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                Join 12,000+ investors
-              </div>
-
-              <h2 className="text-4xl font-black tracking-tight leading-[1.1] mb-5" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                Your wealth,<br />
-                <span className="bg-gradient-to-br from-fuchsia-300 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-                  compounding daily.
-                </span>
-              </h2>
-              <p className="text-[0.875rem] text-slate-400 leading-relaxed max-w-[280px]">
-                Access institutional-grade investment strategies designed to grow your capital consistently.
-              </p>
+          {/* Section 1: Hero equivalent */}
+          <div className="auth-enter auth-enter-delay-1 relative z-10 pt-4">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-purple-400 font-bold mb-3 flex items-center gap-2">
+              <span className="w-8 h-px bg-purple-500/50"></span>
+              Top Ranked Asset Management Company
             </div>
-
-            {/* Stats grid */}
-            <div className="mt-10 grid grid-cols-2 gap-3 auth-enter auth-enter-delay-2">
+            <h2 className="text-5xl lg:text-[54px] font-black tracking-tight leading-[1.05] mb-10 text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Your Future Is<br />
+              <span className="bg-gradient-to-br from-fuchsia-400 to-purple-400 bg-clip-text text-transparent">Our Concern</span>
+            </h2>
+            
+            <div className="grid grid-cols-2 gap-y-5 gap-x-6 mb-12">
               {[
-                { val: '$42.5M', label: 'Total Value Locked' },
-                { val: '12K+', label: 'Active Investors' },
-                { val: '14.2%', label: 'Average APY' },
-                { val: '99.9%', label: 'Uptime SLA' },
-              ].map((s, i) => (
-                <div key={i} className="stat-card">
-                  <div className="text-xl font-black text-white mb-0.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{s.val}</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{s.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Trust badges row */}
-            <div className="mt-8 flex flex-col gap-3 auth-enter auth-enter-delay-3">
-              {[
-                { label: 'Non-custodial — you own your keys' },
-                { label: 'Audited smart contract protocol' },
-                { label: '24/7 dedicated support team' },
-              ].map((b, i) => (
+                'Stock Shares', 'Assets Management',
+                'Infrastructure Shares', 'Forex Shares',
+                'Agricultural Shares', 'Real Estate Planning'
+              ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.25)' }}>
-                    <svg className="w-2.5 h-2.5 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  <div className="w-5 h-5 rounded flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.3)' }}>
+                    <svg className="w-3.5 h-3.5 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-[12px] text-slate-400">{b.label}</span>
+                  <span className="text-sm font-medium text-slate-300">{item}</span>
                 </div>
               ))}
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Link to="/login" className="px-8 py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:-translate-y-0.5"
+                style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
+                Login Now
+              </Link>
+              <a href="#form" className="px-8 py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:-translate-y-0.5 pointer-events-none"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                Get Started
+              </a>
             </div>
           </div>
 
-          <div className="text-[11px] text-slate-600 border-t border-white/[0.05] pt-6 auth-enter auth-enter-delay-4">
-            &copy; {new Date().getFullYear()} Resellscale. All rights reserved.
+          {/* Section 2: Stats (Overlapping style recreated nicely) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auth-enter auth-enter-delay-2 relative z-20">
+            {[
+              { val: '1.4M+', label: 'Active Investors', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+              { val: '4000+', label: "Expert Advisor's", icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
+              { val: '95%', label: 'Success Rate', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+            ].map((s, i) => (
+              <div key={i} className="rounded-2xl p-6 text-center flex flex-col items-center justify-center relative overflow-hidden group shadow-xl"
+                style={{ background: 'rgba(20,25,40,0.8)', border: '1px solid rgba(168,85,247,0.15)', backdropFilter: 'blur(10px)' }}>
+                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ background: 'rgba(168,85,247,0.15)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.2)' }}>
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={s.icon} /></svg>
+                </div>
+                <div className="text-[22px] font-black text-white mb-1.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{s.val}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Section 3: About Our Company */}
+          <div className="auth-enter auth-enter-delay-3 pt-6">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-purple-400 font-bold mb-3">About Our Company</div>
+            <h3 className="text-4xl font-black text-white mb-6 leading-[1.1]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Reach Your Personal<br />Goals With Us
+            </h3>
+            <div className="text-sm text-slate-400 leading-[1.8] space-y-5">
+              <p>
+                Established by a strong team of highly skilled traders and consultants in the offline and online markets. We put your shares in new highly remunerative innovative projects, which offers great returns.
+              </p>
+              <p>
+                We pioneered a consulting-based approach to private asset investing, partnering closely with management teams to offer the insights that challenge conventional thinking, build great businesses, and improve operations. You'll find a team of financial professionals with years of industry experience ready to help you navigate your financial future.
+              </p>
+            </div>
+            <div className="mt-8 flex items-center gap-4">
+              <a href="#explore" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:-translate-y-0.5 pointer-events-none"
+                style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.2)' }}>
+                Explore Now
+              </a>
+              <a href="#step" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:-translate-y-0.5 pointer-events-none"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                Take A Step
+              </a>
+            </div>
+          </div>
+
+          {/* Section 4: What We Do */}
+          <div className="auth-enter auth-enter-delay-4 pt-8 border-t border-white/[0.05]">
+            <div className="text-center mb-10">
+              <div className="text-[11px] uppercase tracking-[0.2em] text-purple-400 font-bold mb-3">Services We Offer</div>
+              <h3 className="text-4xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>What We Do</h3>
+            </div>
+            
+            <div className="space-y-4">
+              {[
+                { title: 'Stocks / Options', desc: 'With over 500+ registered and regulated traders, you can start with our copy trading tool for explosive growth.', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+                { title: 'Mutual Funds', desc: 'Making an entry into household savings with increased awareness and higher efforts towards financial planning.', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+                { title: 'Real Estate', desc: 'We and our affiliates have owned, developed, and managed multifamily, offices, industrial, retail, and hotel properties.', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' }
+              ].map((svc, i) => (
+                <div key={i} className="p-6 rounded-2xl flex gap-5 items-start group transition-all hover:bg-white/[0.04]"
+                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-all group-hover:scale-110"
+                    style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(192,38,211,0.1))', border: '1px solid rgba(168,85,247,0.3)' }}>
+                    <svg className="w-7 h-7 text-fuchsia-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={svc.icon} />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-white mb-2">{svc.title}</h4>
+                    <p className="text-sm text-slate-400 leading-relaxed">{svc.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-[11px] text-slate-600 pt-16 mt-12 border-t border-white/[0.05] text-center">
+              &copy; {new Date().getFullYear()} Resellscale. All rights reserved.
+            </div>
           </div>
         </div>
       </div>
