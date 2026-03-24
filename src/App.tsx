@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
+import EmailConfirmedPage from './pages/EmailConfirmedPage'
 import DashboardLayout from './layouts/DashboardLayout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import DepositPage from './pages/dashboard/DepositPage'
@@ -29,6 +30,7 @@ function App() {
         {/* Auth Routes */}
         <Route path="/" element={<><RegisterPage /><SupportWidget /></>} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
 
         {/* Dashboard Routes with Layout */}
         <Route path="/dashboard" element={<DashboardLayout />}>

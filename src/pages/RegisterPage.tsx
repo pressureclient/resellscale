@@ -197,7 +197,8 @@ export default function RegisterPage() {
         email,
         password: form.password,
         options: {
-          data: { full_name: name, username: form.username, phone: `${form.phoneCode}${form.phoneNumber}` }
+          data: { full_name: name, username: form.username, phone: `${form.phoneCode}${form.phoneNumber}` },
+          emailRedirectTo: `${window.location.origin}/email-confirmed`
         }
       })
       if (signUpError) throw signUpError

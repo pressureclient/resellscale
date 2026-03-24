@@ -224,7 +224,6 @@ export default function ProfilePage() {
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: fullName.trim(),
-        username: username.trim(),
       })
       if (error) throw error
 

@@ -74,10 +74,7 @@ export default function UserDetailsPage() {
     if (!id) return
     
     await supabase.from('profiles').update({ 
-      full_name: fullName,
-      username: username,
-      phone: phone,
-      account_type: accountType
+      full_name: fullName
     }).eq('id', id)
     
     setSavedProfile(true)
