@@ -90,20 +90,20 @@ export default function DashboardPage() {
   const [totalDeposited, setTotalDeposited] = useState(0)
   const [activePlan, setActivePlan] = useState<string | null>(null)
   const [recentTxs, setRecentTxs] = useState<any[]>([])
-  const [refId, setRefId] = useState('invite')
   const [refCopied, setRefCopied] = useState(false)
+  const [username, setUsername] = useState('invite')
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      setRefId(user.email ? btoa(user.email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10) : 'invite')
 
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       if (profile) {
         setBalance(Number(profile.balance) || 0)
         setTotalProfit(Number(profile.total_profit) || 0)
         setTotalDeposited(Number(profile.total_deposited) || 0)
+        setUsername(profile.username || user.user_metadata?.username || btoa(user.email || '').replace(/[^a-zA-Z0-9]/g, '').substring(0, 10))
       }
 
       const { data: txs } = await supabase.from('transactions')
@@ -124,7 +124,7 @@ export default function DashboardPage() {
     fetchData()
   }, [])
 
-  const refLink = `https://resellscale.com/ref/${refId}`
+  const refLink = `${window.location.origin}/?ref=${username}`
   const handleCopyRef = () => {
     navigator.clipboard.writeText(refLink)
     setRefCopied(true)

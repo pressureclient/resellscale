@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import './AuthPage.css'
@@ -149,6 +149,7 @@ const PasswordField = ({ id, label, show, onToggle, value, onChange }: any) => (
 )
 
 export default function RegisterPage() {
+  const [searchParams] = useSearchParams()
   const [form, setForm] = useState({
     username: '',
     fullname: '',
@@ -159,7 +160,7 @@ export default function RegisterPage() {
     confirm_password: '',
     country: '',
     account_type: '',
-    referral: '',
+    referral: searchParams.get('ref') || '',
   })
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
@@ -198,7 +199,12 @@ export default function RegisterPage() {
         email,
         password: form.password,
         options: {
-          data: { full_name: name, username: form.username, phone: `${form.phoneCode}${form.phoneNumber}` },
+          data: { 
+            full_name: name, 
+            username: form.username, 
+            phone: `${form.phoneCode}${form.phoneNumber}`,
+            referred_by: form.referral || null
+          },
           emailRedirectTo: `${window.location.origin}/email-confirmed`
         }
       })
