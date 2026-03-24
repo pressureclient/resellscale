@@ -118,6 +118,7 @@ export default function DepositPage() {
       amount: parseFloat(amount),
       asset: method === 'crypto' && selectedChain ? selectedChain.name : 'USD',
       network: method === 'crypto' && selectedChain ? selectedChain.network : 'CashApp',
+      currency: 'USD',
       status: 'pending',
       reference: method === 'crypto' ? txHash : cashappRef,
     })

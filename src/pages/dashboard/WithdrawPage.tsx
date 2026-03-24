@@ -79,6 +79,7 @@ export default function WithdrawPage() {
         asset: selectedChain ? selectedChain.name : 'USD',
         network: selectedChain ? selectedChain.network : '',
         wallet_address: walletAddress,
+        currency: 'USD',
         status: 'pending',
       })
       if (error) {
