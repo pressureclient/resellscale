@@ -32,15 +32,15 @@ export default function UsersPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto pb-2">
+          <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th className="py-4 px-6">Name</th>
-                <th className="py-4 px-6">Email</th>
-                <th className="py-4 px-6 text-right">Balance</th>
-                <th className="py-4 px-6 text-center">Joined</th>
-                <th className="py-4 px-6 text-center">Action</th>
+                <th className="py-4 px-6 whitespace-nowrap">Name</th>
+                <th className="py-4 px-6 whitespace-nowrap">Email</th>
+                <th className="py-4 px-6 text-right whitespace-nowrap">Balance</th>
+                <th className="py-4 px-6 text-center whitespace-nowrap">Joined</th>
+                <th className="py-4 px-6 text-center whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">

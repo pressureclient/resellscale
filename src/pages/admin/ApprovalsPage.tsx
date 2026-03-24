@@ -59,15 +59,15 @@ export default function ApprovalsPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto pb-2">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th className="py-4 px-6">Type & Date</th>
-                <th className="py-4 px-6">User ID</th>
-                <th className="py-4 px-6 text-right">Amount</th>
-                <th className="py-4 px-6">Asset / Detail</th>
-                <th className="py-4 px-6 text-center">Action</th>
+                <th className="py-4 px-6 whitespace-nowrap">Type & Date</th>
+                <th className="py-4 px-6 whitespace-nowrap">User ID</th>
+                <th className="py-4 px-6 text-right whitespace-nowrap">Amount</th>
+                <th className="py-4 px-6 whitespace-nowrap">Asset / Detail</th>
+                <th className="py-4 px-6 text-center whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
