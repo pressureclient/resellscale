@@ -18,7 +18,7 @@ export default function AdminDashboardPage() {
     fetchData()
   }, [])
 
-  const pendingCount = txs.filter(t => t.status === 'Pending').length
+  const pendingCount = txs.filter(t => t.status === 'pending').length
   
   const totalBalances = users.reduce((acc, u) => acc + (Number(u.balance) || 0), 0)
   const totalDeposited = users.reduce((acc, u) => acc + (Number(u.total_deposited) || 0), 0)

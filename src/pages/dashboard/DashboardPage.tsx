@@ -145,7 +145,7 @@ export default function DashboardPage() {
 
       if (txs) {
         setRecentTxs(txs.map(t => {
-          const timestampToUse = (t.status === 'Completed' && t.completed_at) ? t.completed_at : t.created_at;
+          const timestampToUse = (t.status === 'completed' && t.completed_at) ? t.completed_at : t.created_at;
           return {
             id: t.id, type: t.type, amount: Number(t.amount) || 0,
             status: t.status, date: new Date(timestampToUse).toLocaleDateString()

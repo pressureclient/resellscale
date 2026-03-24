@@ -27,13 +27,13 @@ export default function ApprovalsPage() {
     return () => { supabase.removeChannel(channel) }
   }, [])
 
-  const handleAction = async (id: string, action: 'Completed' | 'Declined', type: string, amount: number, userId: string) => {
+  const handleAction = async (id: string, action: 'completed' | 'declined', type: string, amount: number, userId: string) => {
     await supabase.from('transactions').update({
       status: action,
       completed_at: new Date().toISOString()
     }).eq('id', id)
 
-    if (action === 'Completed') {
+    if (action === 'completed') {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
       if (profile) {
         if (type === 'deposit') {
@@ -59,8 +59,8 @@ export default function ApprovalsPage() {
     loadTxs()
   }
 
-  const pending = transactions.filter(t => t.status === 'Pending')
-  const history = transactions.filter(t => t.status !== 'Pending')
+  const pending = transactions.filter(t => t.status === 'pending')
+  const history = transactions.filter(t => t.status !== 'pending')
   const displayed = activeTab === 'pending' ? pending : history
 
   const userName = (userId: string) => {
@@ -139,11 +139,11 @@ export default function ApprovalsPage() {
                     <td className="py-4 px-6">
                       {activeTab === 'pending' ? (
                         <div className="flex items-center justify-center gap-2">
-                          <button onClick={() => handleAction(tx.id, 'Completed', tx.type, Number(tx.amount), tx.user_id)}
+                          <button onClick={() => handleAction(tx.id, 'completed', tx.type, Number(tx.amount), tx.user_id)}
                             className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors" title="Approve">
                             <Check className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleAction(tx.id, 'Declined', tx.type, Number(tx.amount), tx.user_id)}
+                          <button onClick={() => handleAction(tx.id, 'declined', tx.type, Number(tx.amount), tx.user_id)}
                             className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition-colors" title="Decline">
                             <X className="w-4 h-4" />
                           </button>
@@ -151,8 +151,8 @@ export default function ApprovalsPage() {
                       ) : (
                         <div className="flex justify-center">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-                            tx.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-                            {tx.status === 'Completed' ? <CheckCircle2 className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                            tx.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                            {tx.status === 'completed' ? <CheckCircle2 className="w-3 h-3" /> : <X className="w-3 h-3" />}
                             {tx.status}
                           </span>
                         </div>

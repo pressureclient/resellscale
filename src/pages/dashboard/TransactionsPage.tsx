@@ -19,7 +19,7 @@ export default function TransactionsPage() {
       if (data) {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
         setTxData(data.map(t => {
-          const timestampToUse = (t.status === 'Completed' && t.completed_at) ? t.completed_at : t.created_at;
+          const timestampToUse = (t.status === 'completed' && t.completed_at) ? t.completed_at : t.created_at;
           return {
             id: t.id,
             type: t.type,
@@ -81,9 +81,9 @@ export default function TransactionsPage() {
                   </td>
                   <td className="py-4 px-4 text-center">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold" style={{
-                      background: item.status === 'Completed' ? 'rgba(16,185,129,0.12)' : item.status === 'Declined' ? 'rgba(239,68,68,0.1)' : 'rgba(251,191,36,0.1)',
-                      border: `1px solid ${item.status === 'Completed' ? 'rgba(16,185,129,0.2)' : item.status === 'Declined' ? 'rgba(239,68,68,0.2)' : 'rgba(251,191,36,0.2)'}`,
-                      color: item.status === 'Completed' ? '#34d399' : item.status === 'Declined' ? '#f87171' : '#fbbf24'
+                      background: item.status === 'completed' ? 'rgba(16,185,129,0.12)' : item.status === 'declined' ? 'rgba(239,68,68,0.1)' : 'rgba(251,191,36,0.1)',
+                      border: `1px solid ${item.status === 'completed' ? 'rgba(16,185,129,0.2)' : item.status === 'declined' ? 'rgba(239,68,68,0.2)' : 'rgba(251,191,36,0.2)'}`,
+                      color: item.status === 'completed' ? '#34d399' : item.status === 'declined' ? '#f87171' : '#fbbf24'
                     }}>
                       {item.status}
                     </span>

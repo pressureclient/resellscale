@@ -79,7 +79,7 @@ export default function WithdrawPage() {
         asset: selectedChain ? selectedChain.name : 'USD',
         network: selectedChain ? selectedChain.network : '',
         wallet_address: walletAddress,
-        status: 'Pending',
+        status: 'pending',
       })
       if (error) {
         setWithdrawError('Submission failed: ' + error.message + '. Please contact support.')
