@@ -196,7 +196,7 @@ export default function DashboardPage() {
 
       {/* Stat cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PremiumCard title="Account Balance" amount={balance} icon={Wallet} trend={totalProfit > 0 && totalDeposited > 0 ? ((totalProfit / totalDeposited) * 100).toFixed(1).replace(/\.0$/, '') : undefined} accent="#c026d3" />
+        <PremiumCard title="Account Balance" amount={balance} icon={Wallet} trend={(() => { const base = totalDeposited > 0 ? totalDeposited : (balance - totalProfit > 0 ? balance - totalProfit : balance); return (totalProfit > 0 && base > 0) ? ((totalProfit / base) * 100).toFixed(1).replace(/\.0$/, '') : undefined })()} accent="#c026d3" />
         <PremiumCard title="Total Profit" amount={totalProfit} icon={BarChart2} subtitle="All time earnings" accent="#10b981" />
         <PremiumCard title="Total Deposited" amount={totalDeposited} icon={Gift} subtitle="Lifetime deposits" accent="#f59e0b" />
         <PremiumCard title="Referral Rewards" amount={0} icon={Users} subtitle="From 0 affiliates" accent="#8b5cf6" />

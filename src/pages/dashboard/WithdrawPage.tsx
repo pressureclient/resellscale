@@ -35,6 +35,7 @@ export default function WithdrawPage() {
   const [amount, setAmount] = useState('')
   const [balance, setBalance] = useState(0)
   const [errors, setErrors] = useState<{ wallet?: string; amount?: string }>({})
+  const [withdrawError, setWithdrawError] = useState('')
 
   /* Load real balance from DB */
   useEffect(() => {
@@ -67,18 +68,22 @@ export default function WithdrawPage() {
   const handleWithdraw = async () => {
     const errs = validate()
     setErrors(errs)
+    setWithdrawError('')
     if (Object.keys(errs).length === 0) {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        await supabase.from('transactions').insert({
-          user_id: user.id,
-          type: 'withdraw',
-          amount: parseFloat(amount),
-          asset: selectedChain ? selectedChain.name : 'USD',
-          network: selectedChain ? selectedChain.network : '',
-          wallet_address: walletAddress,
-          status: 'Pending',
-        })
+      if (!user) { setWithdrawError('You must be logged in.'); return }
+      const { error } = await supabase.from('transactions').insert({
+        user_id: user.id,
+        type: 'withdraw',
+        amount: parseFloat(amount),
+        asset: selectedChain ? selectedChain.name : 'USD',
+        network: selectedChain ? selectedChain.network : '',
+        wallet_address: walletAddress,
+        status: 'Pending',
+      })
+      if (error) {
+        setWithdrawError('Submission failed: ' + error.message + '. Please contact support.')
+        return
       }
       setStep('pending')
     }
@@ -264,6 +269,13 @@ export default function WithdrawPage() {
                   </p>
                 </div>
               </div>
+
+              {withdrawError && (
+                <div className="mt-4 p-3 rounded-xl flex items-start gap-2 text-sm text-red-400"
+                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />{withdrawError}
+                </div>
+              )}
 
               <button onClick={handleWithdraw} disabled={!walletAddress || !amount}
                 className="mt-6 w-full py-4 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
