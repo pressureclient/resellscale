@@ -1,40 +1,85 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { supabase } from '../../lib/supabase'
 
 export default function AdminSupportPage() {
-  const [selectedUser, setSelectedUser] = useState<number | null>(1)
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [reply, setReply] = useState('')
+  const [users, setUsers] = useState<any[]>([])
+  const [chats, setChats] = useState<Record<string, {from: 'user'|'admin', text: string, time: string}[]>>({})
+  const [adminId, setAdminId] = useState<string | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
-  const users = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', unread: 2, lastMsg: 'I have a problem with my withdrawal.' },
-    { id: 2, name: 'Sarah Smith', email: 'sarah@example.com', unread: 0, lastMsg: 'Thank you for the help!' },
-    { id: 3, name: 'Michael Chen', email: 'm.chen@example.com', unread: 1, lastMsg: 'When does the crypto pool end?' },
-  ]
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setAdminId(data.user.id)
+    })
+  }, [])
 
-  const [chats, setChats] = useState<Record<number, {from: 'user'|'admin', text: string, time: string}[]>>({
-    1: [
-      { from: 'user', text: 'Hello, my recent withdrawal trace is stuck.', time: '10:45 AM' },
-      { from: 'admin', text: 'Hi John, I am looking into this right now. Could you confirm the wallet address?', time: '10:48 AM' },
-      { from: 'user', text: 'Yes, it is 0x123...abc', time: '10:55 AM' },
-      { from: 'user', text: 'I have a problem with my withdrawal.', time: '11:00 AM' }
-    ],
-    2: [
-      { from: 'user', text: 'Is the new portfolio structure live?', time: 'Yesterday' },
-      { from: 'admin', text: 'Yes, it went live this morning.', time: 'Yesterday' },
-      { from: 'user', text: 'Thank you for the help!', time: '10:00 AM' }
-    ],
-    3: [
-      { from: 'user', text: 'When does the crypto pool end?', time: '9:30 AM' }
-    ]
-  })
+  const fetchAll = async () => {
+    const { data: profiles } = await supabase.from('profiles').select('*')
+    const { data: messages } = await supabase.from('support_messages').select('*').order('created_at', { ascending: true })
 
-  const handleSend = (e: React.FormEvent) => {
+    if (messages && profiles) {
+      const groupedChats: Record<string, any[]> = {}
+      const userMap: Record<string, any> = {}
+      const profMap = Object.fromEntries(profiles.map(p => [p.id, p]))
+
+      messages.forEach((msg: any) => {
+        const uid = msg.user_id
+        if (!groupedChats[uid]) groupedChats[uid] = []
+        
+        groupedChats[uid].push({
+          from: msg.sender_id === uid ? 'user' : 'admin',
+          text: msg.message,
+          time: new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        })
+
+        if (!userMap[uid]) {
+          const p = profMap[uid] || {}
+          userMap[uid] = {
+            id: uid,
+            name: p.full_name || p.username || 'Unknown User',
+            email: 'Confidential', 
+            unread: 0
+          }
+        }
+        userMap[uid].lastMsg = msg.message
+      })
+
+      setChats(groupedChats)
+      setUsers(Object.values(userMap))
+    }
+  }
+
+  useEffect(() => {
+    fetchAll()
+
+    const channel = supabase
+      .channel('admin_support')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, () => {
+         fetchAll() // Refresh all messages on new insert to keep it simple and accurate
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [selectedUser, chats])
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!reply.trim() || !selectedUser) return
-    setChats(prev => ({
-      ...prev,
-      [selectedUser]: [...(prev[selectedUser] || []), { from: 'admin', text: reply, time: 'Just now' }]
-    }))
+    if (!reply.trim() || !selectedUser || !adminId) return
+    
+    const text = reply.trim()
     setReply('')
+
+    await supabase.from('support_messages').insert({
+      user_id: selectedUser,
+      sender_id: adminId,
+      message: text
+    })
   }
 
   const activeUser = users.find(u => u.id === selectedUser)
@@ -65,6 +110,9 @@ export default function AdminSupportPage() {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
+            {users.length === 0 && (
+              <div className="p-6 text-center text-slate-500 text-sm">No active support conversations.</div>
+            )}
             {users.map(u => (
               <button key={u.id} onClick={() => setSelectedUser(u.id)}
                 className="w-full p-4 flex items-center gap-3 text-left transition-all hover:bg-white/5 border-b border-white/[0.02]"
@@ -127,6 +175,7 @@ export default function AdminSupportPage() {
                     <span className="text-[10px] text-slate-500 mt-1 px-1">{msg.time}</span>
                   </div>
                 ))}
+                <div ref={bottomRef} />
               </div>
 
               {/* Chat Input */}

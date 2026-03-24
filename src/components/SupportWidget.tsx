@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MessageSquare, X, Send } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 export default function SupportWidget() {
   const [isOpen, setIsOpen] = useState(false)
@@ -7,15 +8,81 @@ export default function SupportWidget() {
   const [chat, setChat] = useState<{from: 'user' | 'admin', text: string}[]>([
     { from: 'admin', text: 'Hello! How can we help you today?' }
   ])
+  const [userId, setUserId] = useState<string | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
-  const send = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setUserId(data.user.id)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!userId) return
+
+    const fetchHistory = async () => {
+      const { data } = await supabase
+        .from('support_messages')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true })
+      
+      if (data && data.length > 0) {
+        setChat([
+          { from: 'admin', text: 'Hello! How can we help you today?' },
+          ...data.map(m => ({
+            from: m.sender_id === userId ? 'user' : 'admin' as ('user' | 'admin'),
+            text: m.message
+          }))
+        ])
+      }
+    }
+    fetchHistory()
+
+    const channel = supabase
+      .channel('support_widget_user')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'support_messages',
+        filter: `user_id=eq.${userId}` 
+      }, (payload) => {
+        const newMsg = payload.new
+        // Only append if it's not our own optimistic insert? Wait, the hook will fire for our own inserts.
+        // It's safer to just rely on the DB subscription to populate our own messages or use a unique ID to dedupe.
+        // For simplicity, we just rely on the DB channel for all messages, so sending doesn't update state directly.
+        setChat(prev => [...prev, {
+          from: newMsg.sender_id === userId ? 'user' : 'admin',
+          text: newMsg.message
+        }])
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [userId])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chat, isOpen])
+
+  const send = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!msg.trim()) return
-    setChat(prev => [...prev, { from: 'user', text: msg }])
+    const text = msg.trim()
     setMsg('')
-    setTimeout(() => {
-      setChat(prev => [...prev, { from: 'admin', text: "We've received your message. An advisor will get back to you shortly." }])
-    }, 1000)
+
+    if (userId) {
+      await supabase.from('support_messages').insert({
+        user_id: userId,
+        sender_id: userId,
+        message: text
+      })
+    } else {
+      setChat(prev => [...prev, { from: 'user', text }])
+      setTimeout(() => {
+        setChat(prev => [...prev, { from: 'admin', text: "Please sign up or log in so our advisors can assist you further." }])
+      }, 1000)
+    }
   }
 
   return (
@@ -38,6 +105,7 @@ export default function SupportWidget() {
                 {c.text}
               </div>
             ))}
+            <div ref={bottomRef} />
           </div>
           <form onSubmit={send} className="p-3 border-t border-white/10 flex gap-2" style={{ background: 'rgba(5,7,12,0.8)' }}>
             <input type="text" value={msg} onChange={e => setMsg(e.target.value)} placeholder="Type a message..."
@@ -57,3 +125,4 @@ export default function SupportWidget() {
     </div>
   )
 }
+
