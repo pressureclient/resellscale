@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 
 const TradingViewWidget = memo(() => {
   const container = useRef<HTMLDivElement>(null)
+  const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!container.current) return
     container.current.innerHTML = ''
@@ -12,6 +13,7 @@ const TradingViewWidget = memo(() => {
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
     script.type = 'text/javascript'
     script.async = true
+    script.onload = () => setLoaded(true)
     script.innerHTML = JSON.stringify({
       autosize: true, symbol: 'BINANCE:BTCUSDT', interval: '15',
       timezone: 'Etc/UTC', theme: 'dark', style: '1', locale: 'en',
@@ -20,10 +22,22 @@ const TradingViewWidget = memo(() => {
       backgroundColor: 'rgba(6,9,16,0)',
     })
     container.current.appendChild(script)
+    // Widget doesn't fire onload reliably, so we fall back to a short delay
+    const t = setTimeout(() => setLoaded(true), 3000)
+    return () => clearTimeout(t)
   }, [])
   return (
-    <div className="tradingview-widget-container rounded-2xl overflow-hidden" style={{ height: '480px', width: '100%' }}>
-      <div className="tradingview-widget-container__widget" style={{ height: '100%', width: '100%' }} ref={container} />
+    <div className="relative rounded-2xl overflow-hidden" style={{ height: '480px', width: '100%' }}>
+      {!loaded && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10"
+          style={{ background: 'rgba(6,9,16,0.7)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-8 h-8 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
+          <p className="text-xs text-slate-500">Loading live market data…</p>
+        </div>
+      )}
+      <div className="tradingview-widget-container h-full w-full">
+        <div className="tradingview-widget-container__widget h-full w-full" ref={container} />
+      </div>
     </div>
   )
 })
@@ -84,7 +98,6 @@ const Panel = ({ children, className = '' }: any) => (
 )
 
 export default function DashboardPage() {
-  const [loading, setLoading] = useState(true)
   const [balance, setBalance] = useState(0)
   const [totalProfit, setTotalProfit] = useState(0)
   const [totalDeposited, setTotalDeposited] = useState(0)
@@ -98,7 +111,16 @@ export default function DashboardPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      const [
+        { data: profile },
+        { data: txs },
+        { data: profits }
+      ] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
+        supabase.from('profits').select('plan_name').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1)
+      ])
+
       if (profile) {
         setBalance(Number(profile.balance) || 0)
         setTotalProfit(Number(profile.total_profit) || 0)
@@ -106,23 +128,18 @@ export default function DashboardPage() {
         setUsername(profile.username || user.user_metadata?.username || btoa(user.email || '').replace(/[^a-zA-Z0-9]/g, '').substring(0, 10))
       }
 
-      const { data: txs } = await supabase.from('transactions')
-        .select('*').eq('user_id', user.id)
-        .order('created_at', { ascending: false }).limit(3)
-      if (txs) setRecentTxs(txs.map(t => {
-        const timestampToUse = (t.status === 'Completed' && t.completed_at) ? t.completed_at : t.created_at;
-        return {
-          id: t.id, type: t.type, amount: Number(t.amount) || 0,
-          status: t.status, date: new Date(timestampToUse).toLocaleDateString()
-        }
-      }))
+      if (txs) {
+        setRecentTxs(txs.map(t => {
+          const timestampToUse = (t.status === 'Completed' && t.completed_at) ? t.completed_at : t.created_at;
+          return {
+            id: t.id, type: t.type, amount: Number(t.amount) || 0,
+            status: t.status, date: new Date(timestampToUse).toLocaleDateString()
+          }
+        }))
+      }
 
-      const { data: profits } = await supabase.from('profits')
-        .select('plan_name').eq('user_id', user.id)
-        .order('created_at', { ascending: false }).limit(1)
       if (profits && profits.length > 0) setActivePlan(profits[0].plan_name)
 
-      setLoading(false)
     }
     fetchData()
   }, [])
@@ -132,14 +149,6 @@ export default function DashboardPage() {
     navigator.clipboard.writeText(refLink)
     setRefCopied(true)
     setTimeout(() => setRefCopied(false), 2000)
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-24">
-        <div className="w-8 h-8 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
-      </div>
-    )
   }
 
   return (
@@ -172,7 +181,7 @@ export default function DashboardPage() {
 
       {/* Stat cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PremiumCard title="Account Balance" amount={balance} icon={Wallet} trend="0.0" accent="#c026d3" />
+        <PremiumCard title="Account Balance" amount={balance} icon={Wallet} trend={((totalProfit > 0 && totalDeposited > 0) ? (totalProfit / totalDeposited) * 100 : 0).toFixed(1).replace(/\.0$/, '')} accent="#c026d3" />
         <PremiumCard title="Total Profit" amount={totalProfit} icon={BarChart2} subtitle="All time earnings" accent="#10b981" />
         <PremiumCard title="Total Deposited" amount={totalDeposited} icon={Gift} subtitle="Lifetime deposits" accent="#f59e0b" />
         <PremiumCard title="Referral Rewards" amount={0} icon={Users} subtitle="From 0 affiliates" accent="#8b5cf6" />
