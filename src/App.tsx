@@ -1,29 +1,41 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import EmailConfirmedPage from './pages/EmailConfirmedPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
-import DashboardLayout from './layouts/DashboardLayout'
-import DashboardPage from './pages/dashboard/DashboardPage'
-import DepositPage from './pages/dashboard/DepositPage'
-import WithdrawPage from './pages/dashboard/WithdrawPage'
-import TransferPage from './pages/dashboard/TransferPage'
-import CopyTradesPage from './pages/dashboard/CopyTradesPage'
-import HistoryPage from './pages/dashboard/HistoryPage'
-import TransactionsPage from './pages/dashboard/TransactionsPage'
-import ReferralsPage from './pages/dashboard/ReferralsPage'
-import ProfilePage from './pages/dashboard/ProfilePage'
-import SettingsPage from './pages/dashboard/SettingsPage'
-
-// Admin
-import AdminLayout from './layouts/AdminLayout'
-import AdminDashboardPage from './pages/admin/AdminDashboardPage'
-import UsersPage from './pages/admin/UsersPage'
-import UserDetailsPage from './pages/admin/UserDetailsPage'
-import ApprovalsPage from './pages/admin/ApprovalsPage'
-import AdminSupportPage from './pages/admin/AdminSupportPage'
 import SupportWidget from './components/SupportWidget'
+
+// Code-split layouts
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
+const AdminLayout     = lazy(() => import('./layouts/AdminLayout'))
+
+// Code-split dashboard pages
+const DashboardPage    = lazy(() => import('./pages/dashboard/DashboardPage'))
+const DepositPage      = lazy(() => import('./pages/dashboard/DepositPage'))
+const WithdrawPage     = lazy(() => import('./pages/dashboard/WithdrawPage'))
+const TransferPage     = lazy(() => import('./pages/dashboard/TransferPage'))
+const CopyTradesPage   = lazy(() => import('./pages/dashboard/CopyTradesPage'))
+const HistoryPage      = lazy(() => import('./pages/dashboard/HistoryPage'))
+const TransactionsPage = lazy(() => import('./pages/dashboard/TransactionsPage'))
+const ReferralsPage    = lazy(() => import('./pages/dashboard/ReferralsPage'))
+const ProfilePage      = lazy(() => import('./pages/dashboard/ProfilePage'))
+const SettingsPage     = lazy(() => import('./pages/dashboard/SettingsPage'))
+
+// Code-split admin pages
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
+const UsersPage          = lazy(() => import('./pages/admin/UsersPage'))
+const UserDetailsPage    = lazy(() => import('./pages/admin/UserDetailsPage'))
+const ApprovalsPage      = lazy(() => import('./pages/admin/ApprovalsPage'))
+const AdminSupportPage   = lazy(() => import('./pages/admin/AdminSupportPage'))
+
+function PageLoader() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#060910' }}>
+      <div style={{ width: 32, height: 32, border: '2px solid rgba(168,85,247,0.2)', borderTopColor: '#a855f7', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+    </div>
+  )
+}
 
 // Global Auth Handler component to catch stray Supabase hash redirects
 function AuthRedirectHandler() {
@@ -47,7 +59,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthRedirectHandler />
-      <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         {/* Auth Routes */}
         <Route path="/" element={<><RegisterPage /><SupportWidget /></>} />
         <Route path="/login" element={<LoginPage />} />
@@ -79,7 +92,8 @@ function App() {
 
         {/* Catch-all redirect to Home/Register */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

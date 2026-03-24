@@ -86,6 +86,7 @@ export default function DepositPage() {
   const [amount, setAmount] = useState('')
   const [cashappRef, setCashappRef] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const handleChainSelect = (chain: typeof CHAINS[0]) => {
     setSelectedChain(chain)
@@ -108,16 +109,21 @@ export default function DepositPage() {
   const handleSubmit = async () => {
     if (method === 'crypto' && (!txHash || !amount)) return
     if (method === 'cashapp' && (!cashappRef || !amount)) return
+    setSubmitError('')
     const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase.from('transactions').insert({
-        user_id: user.id,
-        type: 'deposit',
-        amount: parseFloat(amount),
-        asset: method === 'crypto' && selectedChain ? selectedChain.name : 'USD',
-        network: method === 'crypto' && selectedChain ? selectedChain.network : 'CashApp',
-        status: 'Pending',
-      })
+    if (!user) { setSubmitError('You must be logged in to submit a deposit.'); return }
+    const { error } = await supabase.from('transactions').insert({
+      user_id: user.id,
+      type: 'deposit',
+      amount: parseFloat(amount),
+      asset: method === 'crypto' && selectedChain ? selectedChain.name : 'USD',
+      network: method === 'crypto' && selectedChain ? selectedChain.network : 'CashApp',
+      status: 'Pending',
+      reference: method === 'crypto' ? txHash : cashappRef,
+    })
+    if (error) {
+      setSubmitError('Submission failed: ' + error.message + '. Please contact support.')
+      return
     }
     setSubmitted(true)
   }

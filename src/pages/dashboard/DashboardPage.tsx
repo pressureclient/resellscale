@@ -4,10 +4,24 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
 const TradingViewWidget = memo(() => {
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const container = useRef<HTMLDivElement>(null)
   const [loaded, setLoaded] = useState(false)
+  const [inView, setInView] = useState(false)
+
+  // Only mount the widget once the panel scrolls into view
   useEffect(() => {
-    if (!container.current) return
+    if (!wrapperRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect() } },
+      { rootMargin: '200px' }
+    )
+    observer.observe(wrapperRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!inView || !container.current) return
     container.current.innerHTML = ''
     const script = document.createElement('script')
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
@@ -25,10 +39,11 @@ const TradingViewWidget = memo(() => {
     // Widget doesn't fire onload reliably, so we fall back to a short delay
     const t = setTimeout(() => setLoaded(true), 3000)
     return () => clearTimeout(t)
-  }, [])
+  }, [inView])
+
   return (
-    <div className="relative rounded-2xl overflow-hidden" style={{ height: '480px', width: '100%' }}>
-      {!loaded && (
+    <div ref={wrapperRef} className="relative rounded-2xl overflow-hidden" style={{ height: '480px', width: '100%' }}>
+      {(!loaded || !inView) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10"
           style={{ background: 'rgba(6,9,16,0.7)', backdropFilter: 'blur(4px)' }}>
           <div className="w-8 h-8 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
@@ -181,7 +196,7 @@ export default function DashboardPage() {
 
       {/* Stat cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PremiumCard title="Account Balance" amount={balance} icon={Wallet} trend={((totalProfit > 0 && totalDeposited > 0) ? (totalProfit / totalDeposited) * 100 : 0).toFixed(1).replace(/\.0$/, '')} accent="#c026d3" />
+        <PremiumCard title="Account Balance" amount={balance} icon={Wallet} trend={totalProfit > 0 && totalDeposited > 0 ? ((totalProfit / totalDeposited) * 100).toFixed(1).replace(/\.0$/, '') : undefined} accent="#c026d3" />
         <PremiumCard title="Total Profit" amount={totalProfit} icon={BarChart2} subtitle="All time earnings" accent="#10b981" />
         <PremiumCard title="Total Deposited" amount={totalDeposited} icon={Gift} subtitle="Lifetime deposits" accent="#f59e0b" />
         <PremiumCard title="Referral Rewards" amount={0} icon={Users} subtitle="From 0 affiliates" accent="#8b5cf6" />

@@ -6,10 +6,14 @@ export default function ApprovalsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [profiles, setProfiles] = useState<Record<string, any>>({})
   const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending')
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const loadTxs = async () => {
-    const { data: txs } = await supabase.from('transactions').select('*').order('created_at', { ascending: false })
-    const { data: profs } = await supabase.from('profiles').select('id, full_name, username, email')
+    setFetchError(null)
+    const { data: txs, error: txErr } = await supabase.from('transactions').select('*').order('created_at', { ascending: false })
+    const { data: profs, error: profErr } = await supabase.from('profiles').select('id, full_name, username, email')
+    if (txErr) { setFetchError('Could not load transactions: ' + txErr.message + '. Check RLS policies on the transactions table.'); return }
+    if (profErr) { setFetchError('Could not load profiles: ' + profErr.message + '. Check RLS policies on the profiles table.'); return }
     if (txs) setTransactions(txs)
     if (profs) setProfiles(Object.fromEntries(profs.map(p => [p.id, p])))
   }
@@ -68,6 +72,11 @@ export default function ApprovalsPage() {
 
   return (
     <div className="space-y-6">
+      {fetchError && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+          ⚠️ {fetchError}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Pending Approvals</h1>
