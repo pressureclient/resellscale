@@ -109,10 +109,13 @@ export default function DashboardPage() {
       const { data: txs } = await supabase.from('transactions')
         .select('*').eq('user_id', user.id)
         .order('created_at', { ascending: false }).limit(3)
-      if (txs) setRecentTxs(txs.map(t => ({
-        id: t.id, type: t.type, amount: Number(t.amount) || 0,
-        status: t.status, date: new Date(t.created_at).toLocaleDateString()
-      })))
+      if (txs) setRecentTxs(txs.map(t => {
+        const timestampToUse = (t.status === 'Completed' && t.completed_at) ? t.completed_at : t.created_at;
+        return {
+          id: t.id, type: t.type, amount: Number(t.amount) || 0,
+          status: t.status, date: new Date(timestampToUse).toLocaleDateString()
+        }
+      }))
 
       const { data: profits } = await supabase.from('profits')
         .select('plan_name').eq('user_id', user.id)
