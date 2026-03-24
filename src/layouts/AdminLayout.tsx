@@ -100,6 +100,17 @@ export default function AdminLayout() {
               {item.label}
             </NavLink>
           ))}
+          
+          <div className="pt-4 mt-4 border-t border-slate-800">
+             <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-slate-800"
+             >
+                <LayoutDashboard className="w-5 h-5 shrink-0" />
+                Return to User Home
+             </Link>
+          </div>
         </nav>
         
         <div className="p-4 border-t border-slate-800">

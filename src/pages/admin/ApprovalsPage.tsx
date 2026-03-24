@@ -15,15 +15,26 @@ export default function ApprovalsPage() {
   }, [])
 
   const handleAction = async (id: string, action: 'Completed' | 'Declined', type: string, amount: number, userId: string) => {
-    await supabase.from('transactions').update({ status: action }).eq('id', id)
+    await supabase.from('transactions').update({ 
+      status: action,
+      completed_at: new Date().toISOString()
+    }).eq('id', id)
     
     if (action === 'Completed') {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
       if (profile) {
          if (type === 'deposit') {
+           // Auto-assign trading plan based on deposit tiers
+           let newPlan = profile.account_type;
+           if (amount >= 500 && amount <= 1999) newPlan = 'Starter Plan';
+           else if (amount >= 2000 && amount <= 4999) newPlan = 'Silver Plan';
+           else if (amount >= 5000 && amount <= 9999) newPlan = 'Gold Plan';
+           else if (amount >= 10000) newPlan = 'Diamond Plan';
+
            await supabase.from('profiles').update({ 
              balance: Number(profile.balance) + amount,
-             total_deposited: Number(profile.total_deposited) + amount 
+             total_deposited: Number(profile.total_deposited) + amount,
+             account_type: newPlan
            }).eq('id', userId)
          } else if (type === 'withdraw') {
            await supabase.from('profiles').update({ 

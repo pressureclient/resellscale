@@ -77,6 +77,7 @@ export default function WithdrawPage() {
           asset: selectedChain ? selectedChain.name : 'USD',
           network: selectedChain ? selectedChain.network : '',
           wallet_address: walletAddress,
+          status: 'Pending',
         })
       }
       setStep('pending')

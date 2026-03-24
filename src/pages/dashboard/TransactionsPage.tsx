@@ -18,15 +18,18 @@ export default function TransactionsPage() {
         
       if (data) {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-        setTxData(data.map(t => ({
-          id: t.id,
-          type: t.type,
-          asset: t.asset,
-          amount: Number(t.amount) || 0,
-          status: t.status,
-          date: new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(t.created_at)),
-          time: new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date(t.created_at))
-        })))
+        setTxData(data.map(t => {
+          const timestampToUse = (t.status === 'Completed' && t.completed_at) ? t.completed_at : t.created_at;
+          return {
+            id: t.id,
+            type: t.type,
+            asset: t.asset,
+            amount: Number(t.amount) || 0,
+            status: t.status,
+            date: new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(timestampToUse)),
+            time: new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date(timestampToUse))
+          }
+        }))
       }
     }
     fetchTxs()
