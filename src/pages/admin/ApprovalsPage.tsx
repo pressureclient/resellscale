@@ -28,10 +28,16 @@ export default function ApprovalsPage() {
   }, [])
 
   const handleAction = async (id: string, action: 'completed' | 'declined', type: string, amount: number, userId: string) => {
-    await supabase.from('transactions').update({
+    setFetchError(null)
+    const { error: updateErr } = await supabase.from('transactions').update({
       status: action,
       completed_at: new Date().toISOString()
     }).eq('id', id)
+
+    if (updateErr) {
+      setFetchError(`Action failed: ${updateErr.message}. (Code: ${updateErr.code})`)
+      return
+    }
 
     if (action === 'completed') {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
@@ -43,16 +49,21 @@ export default function ApprovalsPage() {
           else if (amount >= 5000 && amount <= 9999) newPlan = 'Gold Plan'
           else if (amount >= 10000) newPlan = 'Diamond Plan'
 
-          await supabase.from('profiles').update({
-            balance: Number(profile.balance) + amount,
-            total_deposited: Number(profile.total_deposited) + amount,
+          const { error: pErr1 } = await supabase.from('profiles').update({
+            balance: Number(profile.balance || 0) + amount,
+            total_deposited: Number(profile.total_deposited || 0) + amount,
             account_type: newPlan
           }).eq('id', userId)
+          
+          if (pErr1) { setFetchError(`Profile update failed (Deposit): ${pErr1.message}`); return }
+          
         } else if (type === 'withdraw') {
-          await supabase.from('profiles').update({
-            balance: Number(profile.balance) - amount,
+          const { error: pErr2 } = await supabase.from('profiles').update({
+            balance: Number(profile.balance || 0) - amount,
             total_withdrawn: Number(profile.total_withdrawn || 0) + amount
           }).eq('id', userId)
+          
+          if (pErr2) { setFetchError(`Profile update failed (Withdraw): ${pErr2.message}`); return }
         }
       }
     }
