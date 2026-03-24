@@ -44,14 +44,14 @@ export default function ProfitHistoryPage() {
       </div>
 
       <div className="dark-panel rounded-2xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto pb-2">
+          <table className="w-full text-left border-collapse min-w-[650px]">
             <thead>
               <tr className="border-b border-white/[0.06] text-sm font-semibold text-slate-500 uppercase tracking-wider">
-                <th className="py-4 px-4">Date & Time</th>
-                <th className="py-4 px-4">Plan Source</th>
-                <th className="py-4 px-4 text-right">Amount Earned</th>
-                <th className="py-4 px-4 text-center">Status</th>
+                <th className="py-4 px-4 whitespace-nowrap">Date & Time</th>
+                <th className="py-4 px-4 whitespace-nowrap">Plan Source</th>
+                <th className="py-4 px-4 text-right whitespace-nowrap">Amount Earned</th>
+                <th className="py-4 px-4 text-center whitespace-nowrap">Status</th>
               </tr>
             </thead>
             <tbody>
