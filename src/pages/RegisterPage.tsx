@@ -165,6 +165,7 @@ export default function RegisterPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [registered, setRegistered] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (e.target.name === 'phoneNumber') {
@@ -203,7 +204,7 @@ export default function RegisterPage() {
       })
       if (signUpError) throw signUpError
       localStorage.setItem('rc_user_email', email)
-      window.location.href = '/dashboard'
+      setRegistered(true)
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration.')
     } finally {
@@ -211,6 +212,37 @@ export default function RegisterPage() {
     }
   }
 
+  /* ── Check-email screen shown after successful signup ── */
+  if (registered) {
+    return (
+      <div className="relative min-h-screen bg-[#060910] flex items-center justify-center p-6 auth-noise auth-mesh">
+        <div className="absolute top-[-25%] right-[-10%] w-[55%] h-[55%] rounded-full pointer-events-none animate-orb"
+          style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.18) 0%, rgba(139,92,246,0.08) 50%, transparent 70%)', filter: 'blur(80px)' }} />
+        <div className="absolute bottom-[-20%] left-[-15%] w-[60%] h-[60%] rounded-full pointer-events-none animate-orb-2"
+          style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.15) 0%, rgba(192,38,211,0.07) 50%, transparent 70%)', filter: 'blur(100px)' }} />
+        <div className="w-full max-w-md text-center glass-panel rounded-[24px] p-10 relative z-10">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(192,38,211,0.2))', border: '1px solid rgba(168,85,247,0.3)' }}>
+            <svg className="w-10 h-10 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-black text-white mb-3" style={{ fontFamily: 'Outfit, sans-serif' }}>Check Your Email</h2>
+          <p className="text-slate-400 text-sm leading-relaxed mb-2">We've sent a confirmation link to:</p>
+          <p className="font-bold text-purple-300 mb-6 text-sm">{form.email}</p>
+          <p className="text-slate-500 text-xs leading-relaxed mb-8">
+            Click the link in the email to confirm your account. Once confirmed, return here and log in.
+          </p>
+          <Link to="/login"
+            className="block w-full py-3.5 rounded-xl font-bold text-sm text-white text-center transition-all hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
+            Go to Login →
+          </Link>
+          <p className="text-xs text-slate-600 mt-4">Didn't receive it? Check your spam folder.</p>
+        </div>
+      </div>
+    )
+  }
 
 
   return (
