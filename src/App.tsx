@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
@@ -24,9 +25,28 @@ import ApprovalsPage from './pages/admin/ApprovalsPage'
 import AdminSupportPage from './pages/admin/AdminSupportPage'
 import SupportWidget from './components/SupportWidget'
 
+// Global Auth Handler component to catch stray Supabase hash redirects
+function AuthRedirectHandler() {
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash) {
+      if (hash.includes('type=recovery')) {
+        window.location.replace('/reset-password' + hash)
+      } else if (hash.includes('type=signup')) {
+        window.location.replace('/email-confirmed' + hash)
+      } else if (hash.includes('type=magiclink')) {
+        // Magic link signifies login, so go to dashboard
+        window.location.replace('/dashboard' + hash)
+      }
+    }
+  }, [])
+  return null
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <AuthRedirectHandler />
       <Routes>
         {/* Auth Routes */}
         <Route path="/" element={<><RegisterPage /><SupportWidget /></>} />
