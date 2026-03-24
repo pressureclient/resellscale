@@ -11,7 +11,7 @@ export default function ApprovalsPage() {
   const loadTxs = async () => {
     setFetchError(null)
     const { data: txs, error: txErr } = await supabase.from('transactions').select('*').order('created_at', { ascending: false })
-    const { data: profs, error: profErr } = await supabase.from('profiles').select('id, full_name, email')
+    const { data: profs, error: profErr } = await supabase.from('profiles').select('id, full_name')
     if (txErr) { setFetchError('Could not load transactions: ' + txErr.message + '. Check RLS policies on the transactions table.'); return }
     if (profErr) { setFetchError('Could not load profiles: ' + profErr.message + '. Check RLS policies on the profiles table.'); return }
     if (txs) setTransactions(txs)
