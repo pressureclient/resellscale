@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import EmailConfirmedPage from './pages/EmailConfirmedPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import DashboardLayout from './layouts/DashboardLayout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import DepositPage from './pages/dashboard/DepositPage'
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<><RegisterPage /><SupportWidget /></>} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Dashboard Routes with Layout */}
         <Route path="/dashboard" element={<DashboardLayout />}>

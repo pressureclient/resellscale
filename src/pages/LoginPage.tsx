@@ -31,6 +31,29 @@ export default function LoginPage() {
     }
   }
 
+  const handleResetPassword = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!form.email.trim()) {
+      setError('Please enter your email address first.')
+      return
+    }
+    setError('')
+    setLoading(true)
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      if (resetError) throw resetError
+      // Hacky success message reusing error state for simplicity in Auth UI
+      setError('✓ Password reset link sent! Check your email.')
+    } catch (err: any) {
+      setError(err.message || 'Failed to send reset link.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+
   return (
     <div className="relative min-h-screen bg-[#060910] flex font-sans overflow-hidden text-gray-100 auth-noise auth-mesh">
 
@@ -199,9 +222,9 @@ export default function LoginPage() {
               <div className="field-wrap">
                 <div className="flex items-center justify-between mb-1.5">
                   <label htmlFor="login-password" className="field-label !mb-0">Password</label>
-                  <a href="#" className="text-[11px] font-semibold text-purple-400 hover:text-fuchsia-300 transition-colors">
+                  <button type="button" onClick={handleResetPassword} className="text-[11px] font-semibold text-purple-400 hover:text-fuchsia-300 transition-colors">
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
                 <div className="relative">
                   <input
