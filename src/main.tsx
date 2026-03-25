@@ -10,6 +10,10 @@ class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean,
     this.state = { hasError: false, error: null }
   }
   static getDerivedStateFromError(error: any) {
+    // Auto-reload on Vite chunk loading errors following a redeployment
+    if (/Importing a module script failed|Failed to fetch dynamically imported module/i.test(error?.message)) {
+      window.location.reload()
+    }
     return { hasError: true, error }
   }
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
