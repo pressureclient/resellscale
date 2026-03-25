@@ -153,8 +153,11 @@ export default function DashboardPage() {
         }))
       }
 
-      if (profits && profits.length > 0) setActivePlan(profits[0].plan_name)
-
+      if (profile?.account_type && profile.account_type !== 'Standard' && profile.account_type !== '') {
+        setActivePlan(profile.account_type.replace(/ (Plan|Package)$/i, ''))
+      } else if (profits && profits.length > 0) {
+        setActivePlan(profits[0].plan_name.replace(/ (Plan|Package)$/i, ''))
+      }
     }
     fetchData()
   }, [])
