@@ -29,18 +29,41 @@ export default function ApprovalsPage() {
 
   const handleAction = async (id: string, action: 'completed' | 'declined', type: string, amount: number, userId: string) => {
     setFetchError(null)
+
+    // 1. Fetch transaction first to ensure it is actually pending
+    // This prevents double-clicks from charging the user twice
+    const { data: tx } = await supabase.from('transactions').select('status, amount').eq('id', id).single()
+    if (!tx || tx.status !== 'pending') {
+      setFetchError('Transaction is no longer pending or already processed.')
+      return
+    }
+
+    // 2. Fetch profile to check balances BEFORE modifying anything
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
+    if (!profile) {
+      setFetchError('User profile not found.')
+      return
+    }
+
+    // 3. Prevent withdrawing more than available balance
+    if (action === 'completed' && type === 'withdraw' && profile.balance < amount) {
+      setFetchError(`Cannot approve: User only has $${profile.balance}, which is less than the $${amount} withdrawal request.`)
+      return
+    }
+
+    // 4. Update transaction status
     const { error: updateErr } = await supabase.from('transactions').update({
       status: action,
       completed_at: new Date().toISOString()
-    }).eq('id', id)
+    }).eq('id', id).eq('status', 'pending')
 
     if (updateErr) {
       setFetchError(`Action failed: ${updateErr.message}. (Code: ${updateErr.code})`)
       return
     }
 
+    // 5. Apply side-effects if completed
     if (action === 'completed') {
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
       if (profile) {
         if (type === 'deposit') {
           let newPlan = profile.account_type
