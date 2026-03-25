@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
+import toast from 'react-hot-toast'
 
 export default function AdminSupportPage() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
@@ -9,6 +10,11 @@ export default function AdminSupportPage() {
   const [adminId, setAdminId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const messageCountRef = useRef(0)
+  const selectedUserRef = useRef(selectedUser)
+
+  useEffect(() => {
+    selectedUserRef.current = selectedUser
+  }, [selectedUser])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -22,6 +28,17 @@ export default function AdminSupportPage() {
 
     if (messages && profiles) {
       if (messages.length === messageCountRef.current) return;
+      
+      if (messageCountRef.current > 0 && messages.length > messageCountRef.current) {
+        const newMsgs = messages.slice(messageCountRef.current)
+        newMsgs.forEach(m => {
+          if (m.sender_id !== adminId && m.user_id !== selectedUserRef.current) {
+            const prof = profiles.find(p => p.id === m.user_id)
+            const name = prof?.full_name || prof?.username || 'user'
+            toast(`New message from ${name}`, { icon: '💬' })
+          }
+        })
+      }
       messageCountRef.current = messages.length;
 
       const groupedChats: Record<string, any[]> = {}

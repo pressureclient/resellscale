@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { MessageSquare, X, Send } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
 
 export default function SupportWidget() {
@@ -10,6 +11,12 @@ export default function SupportWidget() {
   ])
   const [userId, setUserId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const prevCount = useRef(0)
+  const isOpenRef = useRef(isOpen)
+
+  useEffect(() => {
+    isOpenRef.current = isOpen
+  }, [isOpen])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -28,6 +35,14 @@ export default function SupportWidget() {
         .order('created_at', { ascending: true })
       
       if (data) {
+        if (prevCount.current > 0 && data.length > prevCount.current) {
+          const newMsg = data[data.length - 1]
+          if (newMsg.sender_id !== userId && !isOpenRef.current) {
+            toast('New message from Support', { icon: '💬' })
+          }
+        }
+        prevCount.current = data.length
+
         setChat(prev => {
           // Only update if the total count changes to avoid unneeded re-renders
           if (prev.length === data.length + 1) return prev;

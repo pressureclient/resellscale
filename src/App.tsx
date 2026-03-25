@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import EmailConfirmedPage from './pages/EmailConfirmedPage'
@@ -59,6 +60,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthRedirectHandler />
+      <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(15,20,35,0.95)', border: '1px solid rgba(168,85,247,0.3)', color: '#fff' } }} />
       <Suspense fallback={<PageLoader />}>
         <Routes>
         {/* Auth Routes */}
