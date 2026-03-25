@@ -5,8 +5,8 @@ import { supabase } from '../lib/supabase'
 export default function SupportWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [msg, setMsg] = useState('')
-  const [chat, setChat] = useState<{from: 'user' | 'admin', text: string}[]>([
-    { from: 'admin', text: 'Hello! How can we help you today?' }
+  const [chat, setChat] = useState<{id?: string, from: 'user' | 'admin', text: string}[]>([
+    { id: 'welcome', from: 'admin', text: 'Hello! How can we help you today?' }
   ])
   const [userId, setUserId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -27,38 +27,42 @@ export default function SupportWidget() {
         .eq('user_id', userId)
         .order('created_at', { ascending: true })
       
-      if (data && data.length > 0) {
-        setChat([
-          { from: 'admin', text: 'Hello! How can we help you today?' },
-          ...data.map(m => ({
-            from: m.sender_id === userId ? 'user' : 'admin' as ('user' | 'admin'),
-            text: m.message
-          }))
-        ])
+      if (data) {
+        setChat(prev => {
+          // Only update if the total count changes to avoid unneeded re-renders
+          if (prev.length === data.length + 1) return prev;
+          return [
+            { id: 'welcome', from: 'admin', text: 'Hello! How can we help you today?' },
+            ...data.map(m => ({
+              id: m.id,
+              from: m.sender_id === userId ? 'user' : 'admin' as ('user' | 'admin'),
+              text: m.message
+            }))
+          ]
+        })
       }
     }
     fetchHistory()
 
+    // Polling fallback (3s) in case Supabase Realtime is not enabled on the table
+    const interval = setInterval(fetchHistory, 3000)
+
     const channel = supabase
-      .channel('support_widget_user')
+      .channel(`support_${userId}`)
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
         table: 'support_messages',
         filter: `user_id=eq.${userId}` 
-      }, (payload) => {
-        const newMsg = payload.new
-        // Only append if it's not our own optimistic insert? Wait, the hook will fire for our own inserts.
-        // It's safer to just rely on the DB subscription to populate our own messages or use a unique ID to dedupe.
-        // For simplicity, we just rely on the DB channel for all messages, so sending doesn't update state directly.
-        setChat(prev => [...prev, {
-          from: newMsg.sender_id === userId ? 'user' : 'admin',
-          text: newMsg.message
-        }])
+      }, () => {
+        fetchHistory()
       })
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    return () => { 
+      clearInterval(interval)
+      supabase.removeChannel(channel) 
+    }
   }, [userId])
 
   useEffect(() => {
@@ -72,6 +76,10 @@ export default function SupportWidget() {
     setMsg('')
 
     if (userId) {
+      // Optimistic update
+      const tempId = Date.now().toString()
+      setChat(prev => [...prev, { id: tempId, from: 'user', text }])
+      
       await supabase.from('support_messages').insert({
         user_id: userId,
         sender_id: userId,

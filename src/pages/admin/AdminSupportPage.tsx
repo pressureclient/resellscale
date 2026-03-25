@@ -8,6 +8,7 @@ export default function AdminSupportPage() {
   const [chats, setChats] = useState<Record<string, {from: 'user'|'admin', text: string, time: string}[]>>({})
   const [adminId, setAdminId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const messageCountRef = useRef(0)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -20,6 +21,9 @@ export default function AdminSupportPage() {
     const { data: messages } = await supabase.from('support_messages').select('*').order('created_at', { ascending: true })
 
     if (messages && profiles) {
+      if (messages.length === messageCountRef.current) return;
+      messageCountRef.current = messages.length;
+
       const groupedChats: Record<string, any[]> = {}
       const userMap: Record<string, any> = {}
       const profMap = Object.fromEntries(profiles.map(p => [p.id, p]))
@@ -54,15 +58,20 @@ export default function AdminSupportPage() {
   useEffect(() => {
     fetchAll()
 
+    const interval = setInterval(fetchAll, 3000)
+
     const channel = supabase
-      .channel('admin_support')
+      .channel(`admin_support_${adminId || 'shared'}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, () => {
          fetchAll() // Refresh all messages on new insert to keep it simple and accurate
       })
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
-  }, [])
+    return () => { 
+      clearInterval(interval)
+      supabase.removeChannel(channel) 
+    }
+  }, [adminId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -75,11 +84,26 @@ export default function AdminSupportPage() {
     const text = reply.trim()
     setReply('')
 
+    // Optimistic update
+    setChats(prev => {
+      const chatCopy = { ...prev }
+      if (!chatCopy[selectedUser]) chatCopy[selectedUser] = []
+      chatCopy[selectedUser] = [...chatCopy[selectedUser], {
+        from: 'admin',
+        text,
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      }]
+      return chatCopy
+    })
+
     await supabase.from('support_messages').insert({
       user_id: selectedUser,
       sender_id: adminId,
       message: text
     })
+    
+    // Fetch implicitly called by real-time or polling, but we can trigger it optionally:
+    // fetchAll()
   }
 
   const activeUser = users.find(u => u.id === selectedUser)
