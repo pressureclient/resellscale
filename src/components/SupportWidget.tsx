@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { MessageSquare, X, Send } from 'lucide-react'
-import toast from 'react-hot-toast'
+
 import { supabase } from '../lib/supabase'
 
 export default function SupportWidget() {
   const [isOpen, setIsOpen] = useState(false)
+  const [hasUnread, setHasUnread] = useState(false)
   const [msg, setMsg] = useState('')
   const [chat, setChat] = useState<{id?: string, from: 'user' | 'admin', text: string}[]>([
     { id: 'welcome', from: 'admin', text: 'Hello! How can we help you today?' }
@@ -16,6 +17,7 @@ export default function SupportWidget() {
 
   useEffect(() => {
     isOpenRef.current = isOpen
+    if (isOpen) setHasUnread(false)
   }, [isOpen])
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function SupportWidget() {
         if (prevCount.current > 0 && data.length > prevCount.current) {
           const newMsg = data[data.length - 1]
           if (newMsg.sender_id !== userId && !isOpenRef.current) {
-            toast('New message from Support', { icon: '💬' })
+            setHasUnread(true)
           }
         }
         prevCount.current = data.length
@@ -141,8 +143,11 @@ export default function SupportWidget() {
         </div>
       )}
       <button onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105 active:scale-95"
+        className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105 active:scale-95"
         style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 8px 32px rgba(192,38,211,0.5)' }}>
+        {hasUnread && !isOpen && (
+          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-[#1a1c29] rounded-full animate-pulse shadow-lg" />
+        )}
         {isOpen ? <X className="w-6 h-6 text-white" /> : <MessageSquare className="w-6 h-6 text-white" />}
       </button>
     </div>
