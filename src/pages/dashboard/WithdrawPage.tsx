@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { usePreferences } from '../../contexts/PreferencesContext'
 import { ArrowLeft, ChevronRight, Check, Clock, AlertTriangle } from 'lucide-react'
 
 const CHAINS = [
@@ -29,6 +30,7 @@ const inputBase = {
 }
 
 export default function WithdrawPage() {
+  const { formatCurrency } = usePreferences()
   const [step, setStep] = useState<Step>('select')
   const [selectedChain, setSelectedChain] = useState<typeof CHAINS[0] | null>(null)
   const [walletAddress, setWalletAddress] = useState('')
@@ -60,8 +62,8 @@ export default function WithdrawPage() {
     const num = parseFloat(amount)
     if (!amount) errs.amount = 'Please enter an amount.'
     else if (isNaN(num) || num <= 0) errs.amount = 'Please enter a valid amount.'
-    else if (num < 100) errs.amount = 'Minimum withdrawal is $100.'
-    else if (num > balance) errs.amount = `Insufficient balance. Your available balance is $${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`
+    else if (num < 100) errs.amount = `Minimum withdrawal is ${formatCurrency(100)}.`
+    else if (num > balance) errs.amount = `Insufficient balance. Your available balance is ${formatCurrency(balance)}.`
     return errs
   }
 
@@ -150,7 +152,7 @@ export default function WithdrawPage() {
             style={{ background: 'rgba(168,85,247,0.07)', border: '1px solid rgba(168,85,247,0.18)' }}>
             <span className="text-sm text-slate-400">Available Balance</span>
             <span className="text-lg font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              ${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              {formatCurrency(balance)}
             </span>
           </div>
           <p className="text-slate-400 text-sm mb-5">Select the asset and network you'd like to withdraw from:</p>
@@ -199,7 +201,7 @@ export default function WithdrawPage() {
               <h3 className="text-xl font-extrabold mb-1 relative z-10">{selectedChain.name}</h3>
               <div className="mt-5 pt-4 relative z-10 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 {[
-                  { l: 'Your Balance', v: `$${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
+                  { l: 'Your Balance', v: formatCurrency(balance) },
                   { l: 'Minimum Withdraw', v: selectedChain.minWithdraw },
                   { l: 'Withdrawal Fee', v: selectedChain.fee },
                   { l: 'Processing Time', v: 'Up to 24 hrs' },
@@ -255,8 +257,8 @@ export default function WithdrawPage() {
                   </div>
                   <ErrorMsg msg={errors.amount} />
                   <p className="text-xs text-slate-600 mt-1.5">
-                    Min: $100 · Fee: <span className="text-purple-400 font-semibold">{selectedChain.fee}</span>
-                    {' '}· Balance: <span className="text-white font-semibold">${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    Min: {formatCurrency(100)} · Fee: <span className="text-purple-400 font-semibold">{selectedChain.fee}</span>
+                    {' '}· Balance: <span className="text-white font-semibold">{formatCurrency(balance)}</span>
                   </p>
                 </div>
 
@@ -308,7 +310,7 @@ export default function WithdrawPage() {
             {[
               { l: 'Asset', v: `${selectedChain.name} (${selectedChain.symbol})` },
               { l: 'Network', v: selectedChain.network },
-              { l: 'Amount', v: `$${parseFloat(amount).toLocaleString()}` },
+              { l: 'Amount', v: formatCurrency(parseFloat(amount) || 0) },
               { l: 'Fee', v: selectedChain.fee },
               { l: 'Destination', v: walletAddress },
             ].map(({ l, v }) => (

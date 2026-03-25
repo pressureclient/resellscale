@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, Clock, ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { usePreferences } from '../../contexts/PreferencesContext'
 
 export default function TransactionsPage() {
+  const { formatCurrency } = usePreferences()
   const [txData, setTxData] = useState<any[]>([])
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function TransactionsPage() {
                   </td>
                   <td className="py-4 px-4 text-sm font-bold text-slate-300">{item.asset}</td>
                   <td className="py-4 px-4 text-right font-bold" style={{ color: item.type === 'deposit' ? '#e879f9' : '#a78bfa' }}>
-                    {item.type === 'deposit' ? '+' : '-'}${item.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    {item.type === 'deposit' ? '+' : '-'}{formatCurrency(item.amount)}
                   </td>
                   <td className="py-4 px-4 text-center">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold" style={{

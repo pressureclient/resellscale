@@ -1,5 +1,6 @@
 import { ArrowLeft, TrendingUp, Zap, Star, Crown, Shield, Rocket, Gem, Check } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { usePreferences } from '../../contexts/PreferencesContext'
 
 const plans = [
   {
@@ -53,6 +54,7 @@ const plans = [
 ]
 
 export default function CopyTradesPage() {
+  const { formatCurrency } = usePreferences()
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -114,7 +116,7 @@ export default function CopyTradesPage() {
                 {plan.name} Plan
               </h3>
               <p className="text-xs text-slate-500 mb-5 font-medium">
-                ${plan.minDeposit.toLocaleString()} – ${plan.maxDeposit.toLocaleString()}
+                {formatCurrency(plan.minDeposit)} – {formatCurrency(plan.maxDeposit)}
               </p>
 
               {/* ROI hero number */}
@@ -159,8 +161,8 @@ export default function CopyTradesPage() {
 
               {/* Est. profit note */}
               <p className="text-[11px] text-slate-600 mb-4">
-                Est. profit from <span className="text-slate-400 font-semibold">${plan.minDeposit.toLocaleString()}</span>:{' '}
-                <span className="text-emerald-400 font-bold">${estProfit.toLocaleString()}</span> in {plan.duration} days
+                Est. profit from <span className="text-slate-400 font-semibold">{formatCurrency(plan.minDeposit)}</span>:{' '}
+                <span className="text-emerald-400 font-bold">{formatCurrency(estProfit)}</span> in {plan.duration} days
               </p>
 
               {/* CTA */}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, memo } from 'react'
 import { Wallet, TrendingUp, Gift, Users, ArrowDownRight, ArrowRight, ArrowUpRight, BarChart2, Activity, Copy, Clock, ShieldCheck, History as HistoryIcon, Check } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { usePreferences } from '../../contexts/PreferencesContext'
 
 const TradingViewWidget = memo(() => {
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -59,6 +60,7 @@ const TradingViewWidget = memo(() => {
 
 /* ── Dark glass stat card ── */
 function PremiumCard({ title, amount, subtitle, icon: Icon, trend, accent }: any) {
+  const { formatCurrency } = usePreferences()
   return (
     <div className="relative rounded-2xl p-5 overflow-hidden group transition-all duration-300 hover:-translate-y-1"
       style={{
@@ -90,8 +92,7 @@ function PremiumCard({ title, amount, subtitle, icon: Icon, trend, accent }: any
       <div className="space-y-1 relative z-10">
         <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">{title}</p>
         <div className="text-2xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.02em' }}>
-          <span className="text-slate-500 font-normal text-lg mr-0.5">$</span>
-          {amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          {formatCurrency(amount)}
         </div>
         {subtitle && <p className="text-xs font-medium text-slate-600">{subtitle}</p>}
       </div>
@@ -113,6 +114,7 @@ const Panel = ({ children, className = '' }: any) => (
 )
 
 export default function DashboardPage() {
+  const { formatCurrency } = usePreferences()
   const [balance, setBalance] = useState(0)
   const [totalProfit, setTotalProfit] = useState(0)
   const [totalDeposited, setTotalDeposited] = useState(0)
@@ -311,7 +313,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-bold" style={{ color: tx.type === 'deposit' ? '#e879f9' : '#a78bfa' }}>
-                        {tx.type === 'deposit' ? '+' : '-'}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        {tx.type === 'deposit' ? '+' : '-'}{formatCurrency(tx.amount)}
                       </div>
                       <div className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded mt-0.5 inline-block"
                         style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(148,163,184,0.7)' }}>

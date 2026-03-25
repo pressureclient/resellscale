@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, Clock, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { usePreferences } from '../../contexts/PreferencesContext'
 
 export default function ProfitHistoryPage() {
+  const { formatCurrency } = usePreferences()
   const [profitData, setProfitData] = useState<any[]>([])
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function ProfitHistoryPage() {
                     </div>
                   </td>
                   <td className="py-4 px-4 text-sm font-medium text-slate-300">{item.plan}</td>
-                  <td className="py-4 px-4 text-right font-bold text-emerald-400">+${item.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                  <td className="py-4 px-4 text-right font-bold text-emerald-400">+{formatCurrency(item.amount)}</td>
                   <td className="py-4 px-4 text-center">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold border border-emerald-100">
                       Credited
