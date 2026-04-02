@@ -55,6 +55,7 @@ const plans = [
 
 export default function CopyTradesPage() {
   const { formatCurrency } = usePreferences()
+
   return (
     <div className="space-y-8">
       {/* Header */}

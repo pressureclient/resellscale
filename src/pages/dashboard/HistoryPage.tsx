@@ -7,6 +7,7 @@ import { usePreferences } from '../../contexts/PreferencesContext'
 export default function ProfitHistoryPage() {
   const { formatCurrency } = usePreferences()
   const [profitData, setProfitData] = useState<any[]>([])
+  const { formatCurrency } = usePreferences()
 
   useEffect(() => {
     const fetchProfits = async () => {

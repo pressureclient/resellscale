@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { usePreferences, LanguageCode, CurrencyCode } from '../../contexts/PreferencesContext'
 import { Bell, Lock, Globe } from 'lucide-react'
 import { TwoFAModal } from './ProfilePage'
+import { usePreferences, LANGUAGE_CODES } from '../../contexts/PreferencesContext'
 
 /* ── Dark panel ── */
 const Panel = ({ children, className = '' }: any) => (
@@ -155,6 +155,7 @@ function PrivacyTab({ onOpen2FA }: { onOpen2FA: () => void }) {
 }
 
 export default function SettingsPage() {
+  const prefs = usePreferences()
   const [activeTab, setActiveTab] = useState<'notifications' | 'privacy' | 'preferences'>('notifications')
   const [show2FA, setShow2FA] = useState(false)
   const [invUpdates, setInvUpdates] = useState(true)
@@ -162,27 +163,25 @@ export default function SettingsPage() {
   const [marketing, setMarketing] = useState(false)
   const [showSaveToast, setShowSaveToast] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const { currency, language, setCurrency, setLanguage } = usePreferences()
-  const [localLanguage, setLocalLanguage] = useState<LanguageCode>(language)
-  const [localCurrency, setLocalCurrency] = useState<CurrencyCode>(currency)
+  const [language, setLanguage] = useState(prefs.language)
+  const [currency, setCurrency] = useState(prefs.currency)
 
   const handleGlobalSave = () => {
     setIsSaving(true)
+    const langChanged = language !== prefs.language
+    
+    prefs.setLanguage(language as any)
+    prefs.setCurrency(currency as any)
+    
     // Simulate save delay
     setTimeout(() => {
       setIsSaving(false)
-      
-      const langChanged = localLanguage !== language
-      setCurrency(localCurrency)
-      setLanguage(localLanguage)
-      
-      setShowSaveToast(true)
-      
       if (langChanged) {
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        const code = LANGUAGE_CODES[language as keyof typeof LANGUAGE_CODES] || 'en'
+        document.cookie = `googtrans=/en/${code}; path=/`
+        window.location.reload()
       } else {
+        setShowSaveToast(true)
         setTimeout(() => setShowSaveToast(false), 3000)
       }
     }, 600)
@@ -293,19 +292,13 @@ export default function SettingsPage() {
                   <label className="block text-sm font-semibold text-slate-300 mb-1">Display Language</label>
                   <p className="text-sm text-slate-500 mb-3">Select your preferred language for the dashboard.</p>
                   <div className="relative w-full sm:w-1/2">
-                    <select value={localLanguage} onChange={e => setLocalLanguage(e.target.value as LanguageCode)}
+                    <select value={language} onChange={e => setLanguage(e.target.value as any)}
                       className="w-full text-sm rounded-xl px-4 py-3 outline-none appearance-none cursor-pointer"
                       style={selectStyle}
                       onFocus={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)'}
                       onBlur={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
-                      {[
-                        { code: 'en', label: 'English' },
-                        { code: 'es', label: 'Spanish (Español)' },
-                        { code: 'fr', label: 'French (Français)' },
-                        { code: 'de', label: 'German (Deutsch)' },
-                        { code: 'zh-CN', label: 'Mandarin (中文)' }
-                      ].map(l => (
-                        <option key={l.code} value={l.code} style={{ background: '#0d1117' }}>{l.label}</option>
+                      {['English', 'Spanish (Español)', 'French (Français)', 'Mandarin (中文)', 'Arabic (العربية)', 'Russian (Русский)'].map(l => (
+                        <option key={l} value={l} style={{ background: '#0d1117' }}>{l}</option>
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500">
@@ -320,18 +313,12 @@ export default function SettingsPage() {
                   <label className="block text-sm font-semibold text-slate-300 mb-1">Local Currency</label>
                   <p className="text-sm text-slate-500 mb-3">Choose fiat currency for portfolio conversions.</p>
                   <div className="relative w-full sm:w-1/2">
-                    <select value={localCurrency} onChange={e => setLocalCurrency(e.target.value as CurrencyCode)}
+                    <select value={currency} onChange={e => setCurrency(e.target.value as any)}
                       className="w-full text-sm rounded-xl px-4 py-3 outline-none appearance-none cursor-pointer"
                       style={selectStyle}
                       onFocus={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)'}
                       onBlur={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
-                      {[
-                        ['USD', 'United States Dollar'],
-                        ['EUR', 'Euro'],
-                        ['GBP', 'British Pound'],
-                        ['NGN', 'Nigerian Naira'],
-                        ['ZAR', 'South African Rand']
-                      ].map(([c, l]) => (
+                      {[['USD', 'United States Dollar'], ['EUR', 'Euro'], ['GBP', 'British Pound'], ['NGN', 'Nigerian Naira'], ['GHS', 'Ghanaian Cedi']].map(([c, l]) => (
                         <option key={c} value={c} style={{ background: '#0d1117' }}>{c} — {l}</option>
                       ))}
                     </select>

@@ -7,6 +7,7 @@ import { usePreferences } from '../../contexts/PreferencesContext'
 export default function TransactionsPage() {
   const { formatCurrency } = usePreferences()
   const [txData, setTxData] = useState<any[]>([])
+  const { formatCurrency } = usePreferences()
 
   useEffect(() => {
     const fetchTxs = async () => {

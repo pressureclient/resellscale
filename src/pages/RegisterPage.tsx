@@ -212,7 +212,14 @@ export default function RegisterPage() {
       localStorage.setItem('rc_user_email', email)
       setRegistered(true)
     } catch (err: any) {
-      setError(err.message || 'An error occurred during registration.')
+      const raw: string = err.message || ''
+      // Supabase returns a verbose "should contain at least one character of each: abcde..."
+      // Replace it with a clean, concise version.
+      if (raw.toLowerCase().includes('should contain at least one')) {
+        setError('Password must include at least one uppercase letter (A), one lowercase letter (a), one number (0–9), and one special character (e.g. @, #, !).')
+      } else {
+        setError(raw || 'An error occurred during registration.')
+      }
     } finally {
       setLoading(false)
     }
