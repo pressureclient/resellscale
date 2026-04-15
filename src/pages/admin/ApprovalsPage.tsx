@@ -5,7 +5,6 @@ import { supabase } from '../../lib/supabase'
 export default function ApprovalsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [profiles, setProfiles] = useState<Record<string, any>>({})
-  const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending')
   const [fetchError, setFetchError] = useState<string | null>(null)
 
   const loadTxs = async () => {
@@ -93,9 +92,8 @@ export default function ApprovalsPage() {
     loadTxs()
   }
 
-  const pending = transactions.filter(t => t.status === 'pending')
-  const history = transactions.filter(t => t.status !== 'pending')
-  const displayed = activeTab === 'pending' ? pending : history
+  const pendingCount = transactions.filter(t => t.status === 'pending').length
+  const displayed = transactions
 
   const userName = (userId: string) => {
     const p = profiles[userId]
@@ -113,22 +111,12 @@ export default function ApprovalsPage() {
       )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Pending Approvals</h1>
-          <p className="text-gray-500 text-sm mt-1">Review and approve deposits or withdrawals.</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Approvals & History</h1>
+          <p className="text-gray-500 text-sm mt-1">Review pending requests and view past transactions.</p>
         </div>
         <span className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-sm font-bold border border-amber-200">
-          <Clock className="w-4 h-4" /> {pending.length} pending
+          <Clock className="w-4 h-4" /> {pendingCount} pending
         </span>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
-        {(['pending', 'history'] as const).map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${activeTab === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-            {tab} {tab === 'pending' ? `(${pending.length})` : `(${history.length})`}
-          </button>
-        ))}
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -140,7 +128,7 @@ export default function ApprovalsPage() {
                 <th className="py-4 px-6 whitespace-nowrap">User</th>
                 <th className="py-4 px-6 text-right whitespace-nowrap">Amount</th>
                 <th className="py-4 px-6 whitespace-nowrap">Asset / Detail</th>
-                <th className="py-4 px-6 text-center whitespace-nowrap">{activeTab === 'pending' ? 'Action' : 'Status'}</th>
+                <th className="py-4 px-6 text-center whitespace-nowrap">Status / Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -171,7 +159,7 @@ export default function ApprovalsPage() {
                       )}
                     </td>
                     <td className="py-4 px-6">
-                      {activeTab === 'pending' ? (
+                      {tx.status === 'pending' ? (
                         <div className="flex items-center justify-center gap-2">
                           <button onClick={() => handleAction(tx.id, 'completed', tx.type, Number(tx.amount), tx.user_id)}
                             className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors" title="Approve">
@@ -201,7 +189,7 @@ export default function ApprovalsPage() {
                       <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                         <Clock className="w-6 h-6 text-gray-400" />
                       </div>
-                      <p>{activeTab === 'pending' ? "No pending approvals. You're all caught up!" : 'No completed transactions yet.'}</p>
+                      <p>No transactions found.</p>
                     </div>
                   </td>
                 </tr>
