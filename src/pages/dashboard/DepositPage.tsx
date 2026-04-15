@@ -267,7 +267,7 @@ export default function DepositPage() {
                   <p className="font-bold text-slate-400 text-base">CashApp</p>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
                     style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#f87171' }}>
-                    Tag Expired — Unavailable
+                    Unavailable Now
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">Temporarily disabled until further notice</p>
@@ -487,7 +487,7 @@ export default function DepositPage() {
           </div>
           <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>CashApp Temporarily Unavailable</h3>
           <p className="text-slate-400 text-sm mb-2 leading-relaxed">
-            Our CashApp tag has expired and is currently unavailable for deposits.
+            CashApp is currently unavailable for deposits.
           </p>
           <p className="text-slate-500 text-xs mb-7 leading-relaxed">
             Please use a cryptocurrency option to fund your account. We'll notify you once CashApp deposits are restored.
