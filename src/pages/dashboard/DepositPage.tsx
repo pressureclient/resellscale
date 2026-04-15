@@ -54,7 +54,7 @@ const CHAINS = [
   },
 ]
 
-const CASHAPP_TAG = '$Millhousenan'
+
 
 type Step = 'select' | 'address' | 'confirm'
 type Method = 'crypto' | 'cashapp'
@@ -81,7 +81,6 @@ export default function DepositPage() {
   const [step, setStep] = useState<Step>('select')
   const [selectedChain, setSelectedChain] = useState<typeof CHAINS[0] | null>(null)
   const [copied, setCopied] = useState(false)
-  const [copiedTag, setCopiedTag] = useState(false)
   const [txHash, setTxHash] = useState('')
   const [amount, setAmount] = useState('')
   const [cashappRef, setCashappRef] = useState('')
@@ -100,11 +99,6 @@ export default function DepositPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleCopyTag = () => {
-    navigator.clipboard.writeText(CASHAPP_TAG)
-    setCopiedTag(true)
-    setTimeout(() => setCopiedTag(false), 2000)
-  }
 
   const handleSubmit = async () => {
     if (method === 'crypto' && (!txHash || !amount)) return
@@ -131,7 +125,7 @@ export default function DepositPage() {
 
   const resetAll = () => {
     setMethod(null); setStep('select'); setSelectedChain(null)
-    setCopied(false); setCopiedTag(false); setTxHash('')
+    setCopied(false); setTxHash('')
     setAmount(''); setCashappRef(''); setSubmitted(false)
   }
 
@@ -240,27 +234,45 @@ export default function DepositPage() {
         <div className="space-y-5">
           <p className="text-slate-400 text-sm">Choose how you want to deposit funds:</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { key: 'crypto' as Method, icon: '₿', title: 'Cryptocurrency', sub: 'BTC, ETH, USDT (TRC-20 / ERC-20 / BEP-20), SOL & more', accent: '#c026d3' },
-              { key: 'cashapp' as Method, icon: null, title: 'CashApp', sub: 'Send via CashApp — fast & easy', accent: '#7c3aed' },
-            ].map(({ key, icon, title, sub, accent }) => (
-              <button key={key}
-                onClick={() => { setMethod(key); if (key === 'cashapp') setStep('address') }}
-                className="group flex items-center gap-5 p-6 rounded-2xl hover:-translate-y-1 transition-all text-left w-full"
-                style={{ ...panelStyle, border: '1px solid rgba(255,255,255,0.08)' }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = `${accent}44`}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'}>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0 group-hover:scale-105 transition-transform"
-                  style={{ background: `linear-gradient(135deg, ${accent}, #7c3aed)`, boxShadow: `0 6px 20px ${accent}30` }}>
-                  {icon ?? <Smartphone className="w-7 h-7" />}
+            {/* ── Crypto card ── */}
+            <button
+              onClick={() => { setMethod('crypto') }}
+              className="group flex items-center gap-5 p-6 rounded-2xl hover:-translate-y-1 transition-all text-left w-full"
+              style={{ ...panelStyle, border: '1px solid rgba(255,255,255,0.08)' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#c026d344'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0 group-hover:scale-105 transition-transform"
+                style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 6px 20px #c026d330' }}>
+                ₿
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-white text-base">Cryptocurrency</p>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">BTC, ETH, USDT (TRC-20 / ERC-20 / BEP-20), SOL &amp; more</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-purple-400 group-hover:translate-x-1 transition-transform shrink-0" />
+            </button>
+
+            {/* ── CashApp card — DISABLED ── */}
+            <div
+              className="relative flex items-center gap-5 p-6 rounded-2xl text-left w-full select-none"
+              style={{ ...panelStyle, border: '1px solid rgba(255,255,255,0.05)', opacity: 0.5, cursor: 'not-allowed' }}>
+              {/* Disabled overlay */}
+              <div className="absolute inset-0 rounded-2xl z-10" style={{ cursor: 'not-allowed' }} />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0"
+                style={{ background: 'linear-gradient(135deg, #374151, #4b5563)', boxShadow: 'none' }}>
+                <Smartphone className="w-7 h-7" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-bold text-slate-400 text-base">CashApp</p>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                    style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#f87171' }}>
+                    Tag Expired — Unavailable
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <p className="font-bold text-white text-base">{title}</p>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{sub}</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-purple-400 group-hover:translate-x-1 transition-transform shrink-0" />
-              </button>
-            ))}
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">Temporarily disabled until further notice</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -466,160 +478,25 @@ export default function DepositPage() {
         </>
       )}
 
-      {/* ── CASHAPP FLOW ── */}
+      {/* ── CASHAPP FLOW — disabled notice ── */}
       {method === 'cashapp' && !submitted && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Left — CashApp details */}
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl p-6 space-y-5" style={panelStyle}>
-              <div className="inline-flex items-center gap-2.5 px-3 py-2 rounded-xl"
-                style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)' }}>
-                <Smartphone className="w-5 h-5 text-purple-300" />
-                <div>
-                  <p className="text-xs font-bold text-purple-200">CashApp</p>
-                  <p className="text-[10px] text-purple-400">Instant deposit</p>
-                </div>
-              </div>
-
-              {/* CashApp QR — white bg so it's scannable */}
-              <div className="flex justify-center">
-                <div className="p-2 rounded-xl bg-white shadow-lg">
-                  <img
-                    src={qrUrl(`https://cash.app/${CASHAPP_TAG}`)}
-                    alt="CashApp QR Code"
-                    className="w-44 h-44 rounded-lg"
-                    crossOrigin="anonymous"
-                  />
-                </div>
-              </div>
-
-              {/* Tag copy */}
-              <div>
-                <label className={labelCls}>CashApp Tag</label>
-                <div className="flex rounded-xl overflow-hidden"
-                  style={{ background: 'rgba(5,7,12,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <div className="px-4 py-3 text-purple-300 flex-1 font-bold text-sm select-all">{CASHAPP_TAG}</div>
-                  <button type="button" onClick={handleCopyTag}
-                    className="px-4 shrink-0 flex items-center gap-1.5 text-xs font-semibold transition-colors"
-                    style={{
-                      borderLeft: '1px solid rgba(255,255,255,0.06)',
-                      background: copiedTag ? 'rgba(168,85,247,0.15)' : 'transparent',
-                      color: copiedTag ? '#c084fc' : 'rgba(148,163,184,0.7)'
-                    }}>
-                    {copiedTag ? <><Check className="w-3.5 h-3.5" /> Copied!</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
-                  </button>
-                </div>
-              </div>
-
-              {/* Important notice */}
-              <div className="rounded-xl p-4 flex gap-3 items-start"
-                style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.2)' }}>
-                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                  style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)' }}>
-                  <Info className="w-3 h-3 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs font-extrabold text-purple-200 uppercase tracking-wide mb-1">Important — Description Required</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    When sending, you <span className="font-bold text-white underline">must</span> set the description to{' '}
-                    <span className="font-bold text-purple-300 px-1 py-0.5 rounded" style={{ background: 'rgba(168,85,247,0.15)' }}>
-                      "Goods and Services"
-                    </span>. Payments without this will not be credited.
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-xl p-3 flex gap-3 items-start"
-                style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)' }}>
-                <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-200/80 leading-relaxed">
-                  After sending, fill the confirmation form on the right with your amount and CashApp reference number.
-                </p>
-              </div>
-            </div>
+        <div className="max-w-md mx-auto text-center py-10">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5"
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', boxShadow: '0 0 24px rgba(239,68,68,0.1)' }}>
+            <Smartphone className="w-10 h-10 text-red-400" />
           </div>
-
-          {/* Right — How-to + confirm form */}
-          <div className="lg:col-span-7 space-y-5">
-            {/* Steps guide */}
-            <div className="rounded-2xl p-6" style={panelStyle}>
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 12px rgba(192,38,211,0.3)' }}>
-                  <Smartphone className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-base font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>How to deposit via CashApp</h3>
-              </div>
-              <div className="space-y-4">
-                {[
-                  { n: 1, t: 'Open CashApp', d: 'Launch CashApp on your phone and tap the "$" (Pay) button.' },
-                  { n: 2, t: `Search for ${CASHAPP_TAG}`, d: `Type ${CASHAPP_TAG} in the search bar to find our account.` },
-                  { n: 3, t: 'Enter the amount', d: 'Enter the dollar amount you want to deposit (minimum $500).' },
-                  { n: 4, t: 'Set description to "Goods and Services"', d: 'Tap the note/description field and type exactly: Goods and Services.' },
-                  { n: 5, t: 'Send & confirm below', d: 'Tap Pay, then fill the confirmation form with your reference number.' },
-                ].map(({ n, t, d }) => (
-                  <div key={n} className="flex gap-4 items-start">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                      style={{ background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.25)', color: '#c084fc' }}>
-                      {n}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-200 text-sm">{t}</p>
-                      <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{d}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Confirm form */}
-            <div className="rounded-2xl p-6 space-y-5" style={panelStyle}>
-              <h3 className="text-base font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Confirm Your CashApp Payment</h3>
-              <p className="text-sm text-slate-400">After sending, enter the details below so we can credit your account.</p>
-
-              <div className="space-y-4">
-                <div>
-                  <label className={labelCls}>Amount Sent (USD)</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 font-bold text-sm">$</span>
-                    <input type="number" step="1" min="500" placeholder="0.00"
-                      value={amount} onChange={e => setAmount(e.target.value)}
-                      className="w-full text-sm rounded-xl pl-8 pr-4 py-3.5 outline-none transition-all"
-                      style={inputStyle}
-                      onFocus={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)'}
-                      onBlur={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'} />
-                  </div>
-                </div>
-                <div>
-                  <label className={labelCls}>CashApp Payment Reference / Note</label>
-                  <input type="text" placeholder="e.g. #ABC123 or transaction note..."
-                    value={cashappRef} onChange={e => setCashappRef(e.target.value)}
-                    className="w-full text-sm rounded-xl px-4 py-3.5 outline-none transition-all"
-                    style={inputStyle}
-                    onFocus={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(168,85,247,0.5)'}
-                    onBlur={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'} />
-                </div>
-                <div className="flex items-center gap-2 p-3 rounded-xl"
-                  style={{ background: 'rgba(168,85,247,0.07)', border: '1px solid rgba(168,85,247,0.18)' }}>
-                  <Check className="w-4 h-4 text-purple-400 shrink-0" />
-                  <p className="text-xs text-purple-300 font-medium">
-                    Remember: description must be{' '}
-                    <span className="px-1 rounded font-bold" style={{ background: 'rgba(168,85,247,0.15)' }}>"Goods and Services"</span>
-                  </p>
-                </div>
-              </div>
-
-              <button onClick={handleSubmit} disabled={!cashappRef || !amount}
-                className="w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
-                style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
-                <CheckCircle2 className="w-5 h-5" /> Submit for Verification
-              </button>
-              <button onClick={resetAll}
-                className="w-full text-xs text-slate-600 hover:text-purple-400 transition-colors py-1">
-                ← Choose a different deposit method
-              </button>
-            </div>
-          </div>
+          <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>CashApp Temporarily Unavailable</h3>
+          <p className="text-slate-400 text-sm mb-2 leading-relaxed">
+            Our CashApp tag has expired and is currently unavailable for deposits.
+          </p>
+          <p className="text-slate-500 text-xs mb-7 leading-relaxed">
+            Please use a cryptocurrency option to fund your account. We'll notify you once CashApp deposits are restored.
+          </p>
+          <button onClick={resetAll}
+            className="py-3 px-8 rounded-xl font-bold text-sm text-white transition-all hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #c026d3, #7c3aed)', boxShadow: '0 4px 16px rgba(192,38,211,0.3)' }}>
+            ← Choose a Different Method
+          </button>
         </div>
       )}
     </div>
