@@ -9,7 +9,7 @@ const CHAINS = [
     name: 'Bitcoin',
     symbol: 'BTC',
     network: 'Bitcoin Network',
-    address: 'bc1qy7jsvdmjjxnju8pq0nzhh8a2pswqxfd32xt4fd',
+    address: 'bc1q86ff25ptppe4enga9n2lpkv0nvw9j684eqycjz',
     display: '₿',
   },
   {
@@ -17,7 +17,7 @@ const CHAINS = [
     name: 'Ethereum',
     symbol: 'ETH',
     network: 'ERC-20 (Ethereum)',
-    address: '0x340720b83EcfacC42532995F8B63805dD8A50730',
+    address: '0xc066157d49edff2c267af764335f84465671e358',
     display: 'Ξ',
   },
   {
@@ -33,7 +33,7 @@ const CHAINS = [
     name: 'USDT (ERC-20)',
     symbol: 'USDT',
     network: 'ERC-20 (Ethereum)',
-    address: '0x340720b83EcfacC42532995F8B63805dD8A50730',
+    address: '0xc066157d49edff2c267af764335f84465671e358',
     display: '₮',
   },
   {
@@ -41,7 +41,7 @@ const CHAINS = [
     name: 'USDT (BEP-20)',
     symbol: 'USDT',
     network: 'BEP-20 (BSC)',
-    address: '0x340720b83EcfacC42532995F8B63805dD8A50730',
+    address: '0xc066157d49edff2c267af764335f84465671e358',
     display: '₮',
   },
   {
@@ -49,7 +49,7 @@ const CHAINS = [
     name: 'Solana',
     symbol: 'SOL',
     network: 'Solana Network',
-    address: 'BBytvzp3xy5hFEgioFove7W4hVSbLqyoSj6Rt9ApdwuZ',
+    address: '7YVBFR1FCKDsKCVHcGWKHSMJ816HadRQHRGXzuevC5vC',
     display: '◎',
   },
 ]
