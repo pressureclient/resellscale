@@ -21,6 +21,7 @@ export default function UserDetailsPage() {
   const [savedBalance, setSavedBalance] = useState(false)
   const [savedProfit, setSavedProfit] = useState(false)
   const [savedProfile, setSavedProfile] = useState(false)
+  const [savedResetProfit, setSavedResetProfit] = useState(false)
 
   const loadUser = async () => {
     if (!id) return
@@ -66,6 +67,17 @@ export default function UserDetailsPage() {
     setSavedProfit(true)
     setProfitAmount('')
     setTimeout(() => setSavedProfit(false), 2000)
+    loadUser()
+  }
+
+  const handleResetProfit = async () => {
+    if (!window.confirm("Are you sure you want to reset this user's total profit to $0.00? This action cannot be undone.")) return
+    if (!id) return
+    
+    await supabase.from('profiles').update({ total_profit: 0 }).eq('id', id)
+    
+    setSavedResetProfit(true)
+    setTimeout(() => setSavedResetProfit(false), 2000)
     loadUser()
   }
 
@@ -176,7 +188,11 @@ export default function UserDetailsPage() {
           </div>
           <form onSubmit={handleAddProfit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Amount ($)</label>
+              <div className="text-sm font-semibold text-gray-700 mb-3 bg-emerald-50/50 border border-emerald-100 rounded-xl px-4 py-2 flex justify-between items-center">
+                <span>Current Total Profit:</span>
+                <span className="font-bold text-emerald-700">${Number(user.total_profit || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+              </div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Inject Amount ($)</label>
               <input
                 type="number"
                 step="0.01"
@@ -204,6 +220,16 @@ export default function UserDetailsPage() {
               {savedProfit ? <CheckCircle2 className="w-5 h-5 text-white" /> : 'Inject Profit'}
             </button>
             <p className="text-xs text-gray-500 text-center mt-2">This will also automatically increase the user's balance.</p>
+            
+            <div className="pt-2 border-t border-gray-100 mt-4">
+              <button
+                type="button"
+                onClick={handleResetProfit}
+                className="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                {savedResetProfit ? <CheckCircle2 className="w-5 h-5 text-red-600" /> : 'Reset Total Profit to $0'}
+              </button>
+            </div>
           </form>
         </div>
       </div>
